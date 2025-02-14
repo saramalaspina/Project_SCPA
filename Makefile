@@ -19,16 +19,18 @@ openmp: bin $(COMMON_SRC) $(OPENMP_MAIN) $(OPENMP_SRC)
 	$(CC) $(CFLAGS) $(OPENMP_FLAGS) -o bin/openmp $(COMMON_SRC) $(OPENMP_SRC)
 
 # CUDA Compilation using CMake
-cuda: clean
+cuda: bin
 	@echo "Compilazione versione CUDA con CMake..."
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && cmake .. && make
+	cd $(BUILD_DIR) && cmake ../src/cuda -DCOMMON_SRC="$(COMMON_SRC)" && make
+	mv $(BUILD_DIR)/exec_cuda bin/cuda  # Sposta l'eseguibile in bin
 
 clean:
 	@echo "Pulizia dei file compilati..."
 	rm -rf bin/openmp bin/cuda $(BUILD_DIR)
 
 run_cuda: cuda
-	./$(BUILD_DIR)/exec_cuda $(MAT) $(MODE)
+	./bin/cuda $(MAT) $(MODE)
 
 .PHONY: all openmp cuda clean
+
