@@ -62,4 +62,11 @@ double *spmv_csr(int M, CSRMatrix *csr, double *x);
 double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x);
 double *spmv_hll_parallel(HLLMatrix *hll, double *x);
 
+// parallel product cuda
+
+#define THREADS_PER_BLOCK 256
+
+double *spmv_csr_cuda(int M, int *IRP, int *JA, double *AS, double *x);
+double *spmv_hll_cuda(int total_rows, int max_nz, double *AS, int *JA, double *x);
+
 #endif //UTILS_H
