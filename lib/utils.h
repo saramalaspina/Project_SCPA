@@ -1,7 +1,3 @@
-//
-// Created by Sara Malaspina on 13/02/25.
-//
-
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -61,7 +57,7 @@ MatrixConversionMediator createMatrixMediator();
 
 double *spmv_csr(int M, CSRMatrix *csr, double *x);
 
-//parallel product
+//parallel product openmp
 
 double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x);
 double *spmv_hll_parallel(HLLMatrix *hll, double *x);
