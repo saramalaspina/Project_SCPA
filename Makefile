@@ -16,7 +16,7 @@ bin:
 # OpenMP Compilation
 openmp: bin $(COMMON_SRC) $(OPENMP_MAIN) $(OPENMP_SRC)
 	@echo "Compilazione versione OpenMP..."
-	$(CC) $(CFLAGS) $(OPENMP_FLAGS) -o bin/openmp $(COMMON_SRC) $(OPENMP_SRC) $(OPENMP_MAIN)
+	$(CC) $(CFLAGS) $(OPENMP_FLAGS) -o bin/openmp $(COMMON_SRC) $(OPENMP_SRC)
 
 # CUDA Compilation using CMake
 cuda: 

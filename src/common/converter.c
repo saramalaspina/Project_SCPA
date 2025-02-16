@@ -166,3 +166,31 @@ void freeHLLMatrix(HLLMatrix *hll) {
     }
     free(hll->blocks);
 }
+
+
+// Funzione che packa il formato ELLPACK per GPU: per ogni blocco, crea array contigui e trasposti
+void packHLLMatrixForGPU(HLLMatrix *hll) {
+    for (int b = 0; b < hll->num_blocks; b++) {
+        ELLBlock *block = &hll->blocks[b];
+        int block_rows = block->rows;
+        int max_nz = block->max_nz;
+        
+        // Allocare memoria per gli array contigui
+        block->JA_flat = (int *)malloc(block_rows * max_nz * sizeof(int));
+        block->AS_flat = (double *)malloc(block_rows * max_nz * sizeof(double));
+        if (!block->JA_flat || !block->AS_flat) {
+            fprintf(stderr, "Errore di allocazione per il blocco %d\n", b);
+            exit(1);
+        }
+        
+        // Riarrangiare i dati in formato trasposto.
+        // Per ogni riga i e per ogni "colonna" j nella rappresentazione ELLPACK:
+        // l'elemento (i,j) va memorizzato in posizione [j * block_rows + i] nell'array flat.
+        for (int i = 0; i < block_rows; i++) {
+            for (int j = 0; j < max_nz; j++) {
+                block->JA_flat[j * block_rows + i] = block->JA[i][j];
+                block->AS_flat[j * block_rows + i] = block->AS[i][j];
+            }
+        }
+    }
+}

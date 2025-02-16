@@ -26,7 +26,17 @@ typedef struct {
     int max_nz;
     int **JA;
     double **AS;
+    int *JA_flat;
+    double *AS_flat;
 } ELLBlock;
+
+typedef struct {
+    int rows;
+    int cols;
+    int max_nz;
+    int *JA_flat;     // Puntatore alla memoria device
+    double *AS_flat;  // Puntatore alla memoria device
+} ELLBlockDevice;
 
 typedef struct {
     int num_blocks;
@@ -41,6 +51,7 @@ typedef struct {
 
 void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix);
 void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
+void packHLLMatrixForGPU(HLLMatrix *hll);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 

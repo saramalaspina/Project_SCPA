@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) {
 
     mediator.convertToCSR(mat->matrix, mat->nz, mat->M, &csr);
     mediator.convertToHLL(mat->matrix, mat->nz, mat->M, mat->N, &hll);
+    packHLLMatrixForGPU(&hll);
 
     // Allocazione dinamica del vettore x
     double *x = (double *)malloc(mat->N * sizeof(double));
@@ -47,12 +48,8 @@ int main(int argc, char *argv[]) {
         printf("%lg\n", res_csr_cuda[i]);
     }
 
-    // **Esecuzione su GPU (HLL)**
-    double *res_hll_cuda = spmv_hll_cuda(hll.num_blocks * HACKSIZE, hll.blocks[0].max_nz, (double *)hll.blocks[0].AS, (int *)hll.blocks[0].JA, x);
-    printf("Risultato calcolo CUDA HLL:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res_hll_cuda[i]);
-    }
+
+
 
     // Libera memoria
     freeCSRMatrix(&csr);
