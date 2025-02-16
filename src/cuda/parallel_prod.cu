@@ -1,4 +1,4 @@
-#include "../../lib/utils.cu"
+#include "../../lib/utils.h"
 #include <cuda_runtime.h>
 
 #include <stdio.h>

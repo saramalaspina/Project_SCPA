@@ -1,7 +1,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-//converter
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// converter
 
 #define HACKSIZE 32
 
@@ -40,11 +44,11 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 
-//reader
+// reader
 
 MatrixElement* read_matrix(char* filename);
 
-//mediator
+// mediator
 
 typedef struct {
     void (*convertToCSR)(COOElement*, int, int, CSRMatrix*);
@@ -53,11 +57,11 @@ typedef struct {
 
 MatrixConversionMediator createMatrixMediator();
 
-//serial product
+// serial product
 
 double *spmv_csr(int M, CSRMatrix *csr, double *x);
 
-//parallel product openmp
+// parallel product openmp
 
 double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x);
 double *spmv_hll_parallel(HLLMatrix *hll, double *x);
@@ -69,4 +73,8 @@ double *spmv_hll_parallel(HLLMatrix *hll, double *x);
 double *spmv_csr_cuda(int M, int *IRP, int *JA, double *AS, double *x);
 double *spmv_hll_cuda(int total_rows, int max_nz, double *AS, int *JA, double *x);
 
-#endif //UTILS_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif // UTILS_H

@@ -34,6 +34,12 @@ int main(int argc, char *argv[]) {
         x[i] = i + 1;
     }
 
+    double *res = spmv_csr(mat->M, &csr, x);
+    printf("Risultato calcolo seriale CSR:\n");
+    for (int i = 0; i < mat->M; i++) {
+        printf("%lg\n", res[i]);
+    }
+
     // **Esecuzione su GPU (CSR)**
     double *res_csr_cuda = spmv_csr_cuda(mat->M, csr.IRP, csr.JA, csr.AS, x);
     printf("Risultato calcolo CUDA CSR:\n");
