@@ -44,6 +44,11 @@ typedef struct {
 } HLLMatrix;
 
 typedef struct {
+    int num_blocks;
+    ELLBlockDevice *blocks;
+} HLLMatrixDevice;
+
+typedef struct {
     int *IRP;
     int *JA;
     double *AS;
@@ -81,8 +86,8 @@ double *spmv_hll_parallel(HLLMatrix *hll, double *x);
 
 #define THREADS_PER_BLOCK 256
 
-double *spmv_csr_cuda(int M, int *IRP, int *JA, double *AS, double *x);
-double *spmv_hll_cuda(int total_rows, int max_nz, double *AS, int *JA, double *x);
+double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x);
+void spmv_hll_cuda(HLLMatrixDevice *d_hll, const double *d_x, double *d_y);
 
 #ifdef __cplusplus
 }

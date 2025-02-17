@@ -163,6 +163,8 @@ void freeHLLMatrix(HLLMatrix *hll) {
         }
         free(hll->blocks[b].JA);
         free(hll->blocks[b].AS);
+        free(hll->blocks[b].JA_flat);
+        free(hll->blocks[b].AS_flat);
     }
     free(hll->blocks);
 }

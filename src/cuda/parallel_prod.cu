@@ -85,31 +85,3 @@ void spmv_hll_cuda(HLLMatrixDevice *d_hll, const double *d_x, double *d_y) {
     }
     cudaDeviceSynchronize();
 }
-
-double *spmv_hll_cuda(int block_rows, int max_nz, double *AS_flat, int *JA_flat, double *x, int N) {
-    double *y = (double *)malloc(block_rows * sizeof(double));
-    double *d_AS, *d_x, *d_y;
-    int *d_JA;
-
-    cudaMalloc(&d_AS, block_rows * max_nz * sizeof(double));
-    cudaMalloc(&d_JA, block_rows * max_nz * sizeof(int));
-    cudaMalloc(&d_x, N * sizeof(double));
-    cudaMalloc(&d_y, block_rows * sizeof(double));
-
-    cudaMemcpy(d_AS, AS_flat, block_rows * max_nz * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_JA, JA_flat, block_rows * max_nz * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
-
-    int blocks = (block_rows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-    spmv_hll_kernel<<<blocks, THREADS_PER_BLOCK>>>(block_rows, max_nz, d_AS, d_JA, d_x, d_y);
-    cudaDeviceSynchronize();  // per verificare eventuali errori
-
-    cudaMemcpy(y, d_y, block_rows * sizeof(double), cudaMemcpyDeviceToHost);
-
-    cudaFree(d_AS);
-    cudaFree(d_JA);
-    cudaFree(d_x);
-    cudaFree(d_y);
-
-    return y;
-}
