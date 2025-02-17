@@ -55,7 +55,7 @@ double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x) {
 
 //HLL
 
-_global_ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const double *AS_t, const double *x, double *y) {
+__global__ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const double *AS_t, const double *x, double *y) {
     int row = blockIdx.x * blockDim.x + threadIdx.x;
     if (row < rows) {
         double sum = 0.0;
