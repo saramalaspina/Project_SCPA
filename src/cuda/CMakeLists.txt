@@ -27,7 +27,7 @@ add_executable(exec_cuda ${COMMON_SOURCES} ${CUDA_SOURCES})
 # Impostazioni specifiche per CUDA
 set_target_properties(exec_cuda PROPERTIES 
     CUDA_SEPARABLE_COMPILATION ON
-    CMAKE_CUDA_ARCHITECTURES 75  # Modifica se necessario
+    CUDA_ARCHITECTURES 75  # Modifica se necessario
 )
 
 # Link alle librerie necessarie

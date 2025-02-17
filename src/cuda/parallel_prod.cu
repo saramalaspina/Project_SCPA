@@ -34,6 +34,12 @@ double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x) {
 
     int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
     spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        printf("CUDA error: %s\n", cudaGetErrorString(err));
+    }
+    cudaDeviceSynchronize(); 
     
     cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
     
