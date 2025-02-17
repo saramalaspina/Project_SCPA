@@ -31,7 +31,7 @@ double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x) {
     cudaMemcpy(d_JA, JA, IRP[M] * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_AS, AS, IRP[M] * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
-    
+
     int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
     spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
     
