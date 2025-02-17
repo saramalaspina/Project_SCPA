@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//CSR
 
 __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = blockIdx.x * blockDim.x + threadIdx.x;
@@ -52,42 +53,80 @@ double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x) {
     return y;
 }
 
-// Kernel CUDA per il prodotto matrice-vettore in formato HLL
-__global__ void spmv_hll_kernel(ELLBlockDevice *d_blocks, int num_blocks, const double *d_x, double *d_y) {
-    int b = blockIdx.x;  // Ogni CUDA block elabora un blocco HLL
-    if (b < num_blocks) {
-        ELLBlockDevice block = d_blocks[b];
-        int rows   = block.rows;
-        int max_nz = block.max_nz;
-        
-        int local_row = threadIdx.x;  // Ogni thread elabora una riga del blocco
-        if (local_row < rows) {
-            double sum = 0.0;
-            // Layout trasposto: per la riga "local_row", gli elementi sono in posizioni: j * rows + local_row
-            for (int j = 0; j < max_nz; j++) {
-                int index = j * rows + local_row;
-                int col   = block.JA_flat[index];
-                double val = block.AS_flat[index];
-                sum += val * d_x[col];
-            }
-            // Calcolo dell'indice globale della riga
-            int global_row = b * HACKSIZE + local_row;
-            d_y[global_row] = sum;
+//HLL
+
+_global_ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const double *AS_t, const double *x, double *y) {
+    int row = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row < rows) {
+        double sum = 0.0;
+        // Per ogni "colonna" (cioè ogni posizione nella riga ELLPACK)
+        for (int j = 0; j < max_nz; j++) {
+            // Poiché i dati sono trasposti, l’accesso è:
+            // elemento (row,j) in formato ELLPACK --> JA_t[j*rows + row] e AS_t[j*rows + row]
+            int col = JA_t[j * rows + row];
+            double val = AS_t[j * rows + row];
+            sum += val * x[col];
         }
+        y[row] = sum;
     }
 }
 
-void spmv_hll_cuda(HLLMatrixDevice *d_hll, const double *d_x, double *d_y) {
-    int numBlocks = d_hll->num_blocks;
-    dim3 grid(numBlocks);
-    dim3 block(HACKSIZE);  // Si lancia HACKSIZE thread per blocco
-    
-    spmv_hll_kernel<<<grid, block>>>(d_hll->blocks, numBlocks, d_x, d_y);
-    
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        fprintf(stderr, "Errore di lancio kernel: %s\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
+double *spmv_hll_cuda(const HLLMatrix *hll, int total_rows, int total_cols, const double *x) {
+    // Allocazione del vettore risultato sul host
+    double *y = (double*)malloc(total_rows * sizeof(double));
+
+    // Allocazione e copia del vettore x sul device
+    double *d_x, *d_y;
+    cudaMalloc(&d_x, total_cols * sizeof(double));
+    cudaMalloc(&d_y, total_rows * sizeof(double));
+    cudaMemcpy(d_x, x, total_cols * sizeof(double), cudaMemcpyHostToDevice);
+
+    int row_offset = 0;  // per posizionare i risultati parziali all’interno di y
+
+    // Processa ciascun blocco HLL (ognuno contiene un blocco in formato ELLPACK)
+    for (int b = 0; b < hll->num_blocks; b++) {
+        // Puntatore al blocco corrente
+        ELLBlock *block = &(hll->blocks[b]);
+        int rows = block->rows;
+        int max_nz = block->max_nz;
+
+        // Dimensione dei dati trasposti per il blocco
+        size_t size_int = rows * max_nz * sizeof(int);
+        size_t size_double = rows * max_nz * sizeof(double);
+
+        // Alloca memoria sul device per JA_t e AS_t del blocco
+        int *d_JA_t;
+        double *d_AS_t;
+        cudaMalloc(&d_JA_t, size_int);
+        cudaMalloc(&d_AS_t, size_double);
+
+        // Copia dei dati del blocco sul device
+        cudaMemcpy(d_JA_t, block->JA_t, size_int, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_AS_t, block->AS_t, size_double, cudaMemcpyHostToDevice);
+
+        // Calcola la configurazione di esecuzione per il kernel
+        int numBlocks = (rows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+        // Il kernel scrive in d_y a partire da d_y + row_offset
+        spmv_hll_kernel<<<numBlocks, THREADS_PER_BLOCK>>>(rows, max_nz, d_JA_t, d_AS_t, d_x, d_y + row_offset);
+        cudaDeviceSynchronize();
+
+        // Libera la memoria allocata per il blocco
+        cudaFree(d_JA_t);
+        cudaFree(d_AS_t);
+
+        row_offset += rows;
     }
-    cudaDeviceSynchronize();
+
+    // Copia del vettore risultato dal device al host
+    cudaMemcpy(y, d_y, total_rows * sizeof(double), cudaMemcpyDeviceToHost);
+
+    // Libera la memoria sul device
+    cudaFree(d_x);
+    cudaFree(d_y);
+
+    return y;
 }
+
+
+
+

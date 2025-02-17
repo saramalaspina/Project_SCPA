@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     freeHLLMatrix(&hll);
     free(mat->matrix);
     free(mat);
+    free(res);
     free(res_csr);
     free(res_hll);
     free(x);

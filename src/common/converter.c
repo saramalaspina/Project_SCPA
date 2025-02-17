@@ -163,36 +163,64 @@ void freeHLLMatrix(HLLMatrix *hll) {
         }
         free(hll->blocks[b].JA);
         free(hll->blocks[b].AS);
-        free(hll->blocks[b].JA_flat);
-        free(hll->blocks[b].AS_flat);
+        free(hll->blocks[b].JA_t);
+        free(hll->blocks[b].AS_t);
     }
     free(hll->blocks);
 }
 
 
-// Funzione che packa il formato ELLPACK per GPU: per ogni blocco, crea array contigui e trasposti
-void packHLLMatrixForGPU(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        ELLBlock *block = &hll->blocks[b];
-        int block_rows = block->rows;
-        int max_nz = block->max_nz;
-        
-        // Allocare memoria per gli array contigui
-        block->JA_flat = (int *)malloc(block_rows * max_nz * sizeof(int));
-        block->AS_flat = (double *)malloc(block_rows * max_nz * sizeof(double));
-        if (!block->JA_flat || !block->AS_flat) {
-            fprintf(stderr, "Errore di allocazione per il blocco %d\n", b);
-            exit(1);
-        }
-        
-        // Riarrangiare i dati in formato trasposto.
-        // Per ogni riga i e per ogni "colonna" j nella rappresentazione ELLPACK:
-        // l'elemento (i,j) va memorizzato in posizione [j * block_rows + i] nell'array flat.
-        for (int i = 0; i < block_rows; i++) {
-            for (int j = 0; j < max_nz; j++) {
-                block->JA_flat[j * block_rows + i] = block->JA[i][j];
-                block->AS_flat[j * block_rows + i] = block->AS[i][j];
-            }
+void transposeELLBlock(ELLBlock *block) {
+    int rows = block->rows;
+    int max_nz = block->max_nz;
+    
+    // Alloca gli array contigui per la versione trasposta
+    block->JA_t = malloc(rows * max_nz * sizeof(int));
+    block->AS_t = malloc(rows * max_nz * sizeof(double));
+    
+    // Esegui la trasposizione: per ogni elemento (r, c) nell'originale
+    // copia in posizione (c, r) nel vettore trasposto
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < max_nz; c++) {
+            block->JA_t[c * rows + r] = block->JA[r][c];
+            block->AS_t[c * rows + r] = block->AS[r][c];
         }
     }
 }
+
+void trasponseHLLMatrix(HLLMatrix *hll) {
+    for (int b = 0; b < hll->num_blocks; b++) {
+        ELLBlock *block = &hll->blocks[b];
+        transposeELLBlock(block);
+    }
+}
+
+void printELLBlockTransposed(const ELLBlock *block) {
+    printf("JA_t (trasposta) =\n");
+    for (int r = 0; r < block->max_nz; r++) {
+        for (int c = 0; c < block->rows; c++) {
+            int idx = r * block->rows + c;
+            printf(" %d", block->JA_t[idx]);
+        }
+        printf("\n");
+    }
+    printf("AS_t (trasposta) =\n");
+    for (int r = 0; r < block->max_nz; r++) {
+        for (int c = 0; c < block->rows; c++) {
+            int idx = r * block->rows + c;
+            printf(" %.1f", block->AS_t[idx]);
+        }
+        printf("\n");
+    }
+}
+
+
+void printHLLMatrixTransposed(const HLLMatrix *H) {
+    printf("Transposed HLL Matrix with %d block(s)\n", H->num_blocks);
+    for (int b = 0; b < H->num_blocks; b++) {
+        printf("Block %d:\n", b);
+        printELLBlockTransposed(&H->blocks[b]);
+    }
+}
+
+

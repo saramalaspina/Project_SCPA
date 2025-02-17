@@ -26,27 +26,14 @@ typedef struct {
     int max_nz;
     int **JA;
     double **AS;
-    int *JA_flat;
-    double *AS_flat;
+    int *JA_t;
+    double *AS_t;
 } ELLBlock;
-
-typedef struct {
-    int rows;
-    int cols;
-    int max_nz;
-    int *JA_flat;     // Puntatore alla memoria device
-    double *AS_flat;  // Puntatore alla memoria device
-} ELLBlockDevice;
 
 typedef struct {
     int num_blocks;
     ELLBlock *blocks;
 } HLLMatrix;
-
-typedef struct {
-    int num_blocks;
-    ELLBlockDevice *blocks;
-} HLLMatrixDevice;
 
 typedef struct {
     int *IRP;
@@ -56,9 +43,10 @@ typedef struct {
 
 void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix);
 void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
-void packHLLMatrixForGPU(HLLMatrix *hll);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
+void trasponseHLLMatrix(HLLMatrix *hll);
+void printHLLMatrixTransposed(const HLLMatrix *H);
 
 // reader
 
@@ -87,7 +75,7 @@ double *spmv_hll_parallel(HLLMatrix *hll, double *x);
 #define THREADS_PER_BLOCK 256
 
 double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x);
-void spmv_hll_cuda(HLLMatrixDevice *d_hll, const double *d_x, double *d_y);
+double *spmv_hll_cuda(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
 
 #ifdef __cplusplus
 }
