@@ -45,7 +45,7 @@ void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix) {
 
     free(row_counter);  // Rilascia la memoria allocata
 
-    // Stampa del formato CSR
+   /* // Stampa del formato CSR
     printf("IRP: ");
     for (int i = 0; i <= m; i++) {
         printf("%d ", matrix->IRP[i]);
@@ -62,7 +62,7 @@ void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix) {
     for (int i = 0; i < nz; i++) {
         printf("%20.19g ", matrix->AS[i]);
     }
-    printf("\n");
+    printf("\n");*/
 
 }
 
@@ -129,7 +129,7 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
             }
         }
 
-        printf("HLL Matrix with %d blocks\n", hll -> num_blocks);
+        /*printf("HLL Matrix with %d blocks\n", hll -> num_blocks);
         for (int b = 0; b < hll -> num_blocks; b++) {
             printf("Block %d:\n", b);
             printf("JA =\n");
@@ -148,7 +148,7 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
                 }
                 printf("\n");
             }
-        }
+        }*/
 
         free(row_nnz);
         free(current_nz);
@@ -195,7 +195,7 @@ void trasponseHLLMatrix(HLLMatrix *hll) {
     }
 }
 
-void printELLBlockTransposed(const ELLBlock *block) {
+/*void printELLBlockTransposed(const ELLBlock *block) {
     printf("JA_t (trasposta) =\n");
     for (int r = 0; r < block->max_nz; r++) {
         for (int c = 0; c < block->rows; c++) {
@@ -221,6 +221,6 @@ void printHLLMatrixTransposed(const HLLMatrix *H) {
         printf("Block %d:\n", b);
         printELLBlockTransposed(&H->blocks[b]);
     }
-}
+}*/
 
 

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     mediator.convertToHLL(mat->matrix, mat->nz, mat->M, mat->N, &hll);
 
     trasponseHLLMatrix(&hll);
-    printHLLMatrixTransposed(&hll);
+    //printHLLMatrixTransposed(&hll);
 
     // Allocazione dinamica del vettore x
     double *x = (double *)malloc(mat->N * sizeof(double));

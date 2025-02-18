@@ -104,10 +104,10 @@ MatrixElement* read_matrix(char *file_name) {
     }
 
    
-    mm_write_banner(stdout, matcode);
+    /*mm_write_banner(stdout, matcode);
     mm_write_mtx_crd_size(stdout, M, N, nz);
     for (i = 0; i < nz; i++)
-        fprintf(stdout, "%d %d %20.19g\n", I[i], J[i], val[i]);
+        fprintf(stdout, "%d %d %20.19g\n", I[i], J[i], val[i]);*/
 
     /* Trasferimento dei dati in una struttura COO (o altra struttura scelta) */
     COOElement *coo = malloc(nz * sizeof(COOElement));

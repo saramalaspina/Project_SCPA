@@ -46,7 +46,7 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void trasponseHLLMatrix(HLLMatrix *hll);
-void printHLLMatrixTransposed(const HLLMatrix *H);
+//void printHLLMatrixTransposed(const HLLMatrix *H);
 
 // reader
 
