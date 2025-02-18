@@ -42,7 +42,6 @@ MatrixElement* read_matrix(char *file_name) {
     */
     for (i = 0; i < nz; i++) {
         if (mm_is_pattern(matcode)) {
-            printf("Pattern matrix\n");
             if (fscanf(f, "%d %d\n", &I[i], &J[i]) != 2) {
                 printf("Error reading pattern matrix entry\n");
                 exit(1);

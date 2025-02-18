@@ -38,22 +38,12 @@ int main(int argc, char *argv[])
     }
 
     double *res = spmv_csr(mat->M, &csr, x);
-    printf("Risultato calcolo seriale CSR:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res[i]);
-    }
 
     double *res_csr = spmv_csr_parallel(mat->M, &csr, x);
-    printf("Risultato calcolo parallelo CSR:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res_csr[i]);
-    }
 
     double *res_hll = spmv_hll_parallel(&hll, x);
-    printf("Risultato calcolo parallelo HLL:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res_hll[i]);
-    }
+
+    printf("Calcoli terminati\n");
 
     freeCSRMatrix(&csr);
     freeHLLMatrix(&hll);

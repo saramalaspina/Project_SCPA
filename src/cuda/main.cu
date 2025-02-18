@@ -38,23 +38,13 @@ int main(int argc, char *argv[]) {
     }
 
     double *res = spmv_csr(mat->M, &csr, x);
-    printf("Risultato calcolo seriale CSR:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res[i]);
-    }
 
     // **Esecuzione su GPU (CSR)**
     double *res_csr_cuda = spmv_csr_cuda(mat->M, mat->N, csr.IRP, csr.JA, csr.AS, x);
-    printf("Risultato calcolo CUDA CSR:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res_csr_cuda[i]);
-    }
-
+    // **Esecuzione su GPU (HLL)**
     double *res_hll_cuda = spmv_hll_cuda(&hll, mat->M, mat->N, x);
-    printf("Risultato calcolo CUDA HLL:\n");
-    for (int i = 0; i < mat->M; i++) {
-        printf("%lg\n", res_hll_cuda[i]);
-    }
+
+    printf("Calcoli terminati\n");
 
     free(x);
     freeHLLMatrix(&hll);
