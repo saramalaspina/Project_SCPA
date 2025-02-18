@@ -19,6 +19,7 @@ file(GLOB COMMON_SOURCES ../common/*.c)
 set(CUDA_SOURCES
     main.cu
     parallel_prod.cu
+    execution.cu
 )
 
 # Creazione dell'eseguibile
