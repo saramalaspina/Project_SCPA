@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     }
 
     for (int i = 0; i < mat->N; i++) {
-        x[i] = i + 1;
+        x[i] = 1.0;
     }
 
     double *res = spmv_csr(mat->M, &csr, x);
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     printf("Calcoli terminati\n");
 
     freeCSRMatrix(&csr);
-    freeHLLMatrix(&hll);
+    freeHLLMatrix_openmp(&hll);
     free(mat->matrix);
     free(mat);
     free(res);

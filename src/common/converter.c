@@ -124,10 +124,12 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
         }
 
         for (int i = 0; i < block_rows; i++) {
-            for (int j = current_nz[i]; j < max_nz; j++) {
-                hll->blocks[b].JA[i][j] = hll->blocks[b].JA[i][j - 1];
+            if (current_nz[i] > 0) {
+                for (int j = current_nz[i]; j < max_nz; j++) {
+                    hll->blocks[b].JA[i][j] = hll->blocks[b].JA[i][j - 1];
+                }
             }
-        }
+        }        
 
         /*printf("HLL Matrix with %d blocks\n", hll -> num_blocks);
         for (int b = 0; b < hll -> num_blocks; b++) {
@@ -155,7 +157,7 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
     }
 }
 
-void freeHLLMatrix(HLLMatrix *hll) {
+void freeHLLMatrix_cuda(HLLMatrix *hll) {
     for (int b = 0; b < hll->num_blocks; b++) {
         for (int i = 0; i < hll->blocks[b].rows; i++) {
             free(hll->blocks[b].JA[i]);
@@ -165,6 +167,18 @@ void freeHLLMatrix(HLLMatrix *hll) {
         free(hll->blocks[b].AS);
         free(hll->blocks[b].JA_t);
         free(hll->blocks[b].AS_t);
+    }
+    free(hll->blocks);
+}
+
+void freeHLLMatrix_openmp(HLLMatrix *hll) {
+    for (int b = 0; b < hll->num_blocks; b++) {
+        for (int i = 0; i < hll->blocks[b].rows; i++) {
+            free(hll->blocks[b].JA[i]);
+            free(hll->blocks[b].AS[i]);
+        }
+        free(hll->blocks[b].JA);
+        free(hll->blocks[b].AS);
     }
     free(hll->blocks);
 }
