@@ -66,12 +66,6 @@ void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix) {
 
 }
 
-void freeCSRMatrix(CSRMatrix *csr){
-    free(csr->IRP);
-    free(csr->JA);
-    free(csr->AS);
-}
-
 // Definizione COO->HLL Converter
 typedef struct {
     void (*convert)(COOElement *coo, int nz, int m);
@@ -157,32 +151,6 @@ void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
     }
 }
 
-void freeHLLMatrix_cuda(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        for (int i = 0; i < hll->blocks[b].rows; i++) {
-            free(hll->blocks[b].JA[i]);
-            free(hll->blocks[b].AS[i]);
-        }
-        free(hll->blocks[b].JA);
-        free(hll->blocks[b].AS);
-        free(hll->blocks[b].JA_t);
-        free(hll->blocks[b].AS_t);
-    }
-    free(hll->blocks);
-}
-
-void freeHLLMatrix_openmp(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        for (int i = 0; i < hll->blocks[b].rows; i++) {
-            free(hll->blocks[b].JA[i]);
-            free(hll->blocks[b].AS[i]);
-        }
-        free(hll->blocks[b].JA);
-        free(hll->blocks[b].AS);
-    }
-    free(hll->blocks);
-}
-
 
 void transposeELLBlock(ELLBlock *block) {
     int rows = block->rows;
@@ -208,33 +176,5 @@ void trasponseHLLMatrix(HLLMatrix *hll) {
         transposeELLBlock(block);
     }
 }
-
-/*void printELLBlockTransposed(const ELLBlock *block) {
-    printf("JA_t (trasposta) =\n");
-    for (int r = 0; r < block->max_nz; r++) {
-        for (int c = 0; c < block->rows; c++) {
-            int idx = r * block->rows + c;
-            printf(" %d", block->JA_t[idx]);
-        }
-        printf("\n");
-    }
-    printf("AS_t (trasposta) =\n");
-    for (int r = 0; r < block->max_nz; r++) {
-        for (int c = 0; c < block->rows; c++) {
-            int idx = r * block->rows + c;
-            printf(" %.1f", block->AS_t[idx]);
-        }
-        printf("\n");
-    }
-}
-
-
-void printHLLMatrixTransposed(const HLLMatrix *H) {
-    printf("Transposed HLL Matrix with %d block(s)\n", H->num_blocks);
-    for (int b = 0; b < H->num_blocks; b++) {
-        printf("Block %d:\n", b);
-        printELLBlockTransposed(&H->blocks[b]);
-    }
-}*/
 
 

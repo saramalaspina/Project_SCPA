@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x) {
+double *prodOpenmpCSR(int M, CSRMatrix *csr, double *x) {
     double *y = calloc(M, sizeof(double));  // Allocazione del risultato
     if (!y) {
         fprintf(stderr, "Errore di allocazione della memoria\n");
@@ -27,7 +27,7 @@ double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x) {
 }
 
 
-double *spmv_hll_parallel(HLLMatrix *hll, double *x) {
+double *prodOpenmpHLL(HLLMatrix *hll, double *x) {
     int total_rows = hll->num_blocks * HACKSIZE;  // Numero totale di righe
 
     double *y = calloc(total_rows, sizeof(double));  // Allocazione dinamica

@@ -17,7 +17,7 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x) {
+double *prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x) {
     double *y = (double *)malloc(M * sizeof(double));
     int *d_IRP, *d_JA;
     double *d_AS, *d_x, *d_y;
@@ -71,7 +71,7 @@ __global__ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const dou
     }
 }
 
-double *spmv_hll_cuda(const HLLMatrix *hll, int total_rows, int total_cols, const double *x) {
+double *prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x) {
     // Allocazione del vettore risultato sul host
     double *y = (double*)malloc(total_rows * sizeof(double));
 

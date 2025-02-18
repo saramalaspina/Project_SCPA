@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double *spmv_csr(int M, CSRMatrix *csr, double *x) {
+double *prodSerial(int M, CSRMatrix *csr, double *x) {
 
     double *y = calloc(M, sizeof(double));  // Allocazione del risultato
     if (!y) {

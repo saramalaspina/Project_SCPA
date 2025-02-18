@@ -3,10 +3,11 @@
 #include "../../lib/utils.h"
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s [matrix-market-filename]\n", argv[0]);
+
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s [matrix-market-filename] [format]\n", argv[0]);
         exit(1);
-    }
+    }    
 
     MatrixElement *mat = read_matrix(argv[1]);
     if (!mat) exit(1);
@@ -14,46 +15,21 @@ int main(int argc, char *argv[]) {
     // Creazione del mediatore
     MatrixConversionMediator mediator = createMatrixMediator();
 
-    // Creazione struct formato CSR
-    CSRMatrix csr;
+    char *e = argv[2];
 
-    // Dichiarazione struct formato HLL
-    HLLMatrix hll;
-
-    mediator.convertToCSR(mat->matrix, mat->nz, mat->M, &csr);
-    mediator.convertToHLL(mat->matrix, mat->nz, mat->M, mat->N, &hll);
-
-    trasponseHLLMatrix(&hll);
-    //printHLLMatrixTransposed(&hll);
-
-    // Allocazione dinamica del vettore x
-    double *x = (double *)malloc(mat->N * sizeof(double));
-    if (!x) {
-        fprintf(stderr, "Errore nell'allocazione di memoria per x.\n");
-        return 1;
+    switch(e[0]){
+        case 'S': 
+            serialExecutionCuda(mat, mediator);
+            break;
+        case 'H':
+            hllExecutionCuda(mat, mediator);
+            break;
+        case 'C':
+            csrExecutionCuda(mat, mediator);
+            break;
+        default:
+            printf("Tipo di esecuzione non riconosciuto");    
     }
-
-    for (int i = 0; i < mat->N; i++) {
-        x[i] = 1.0;
-    }
-
-    double *res = spmv_csr(mat->M, &csr, x);
-
-    // **Esecuzione su GPU (CSR)**
-    double *res_csr_cuda = spmv_csr_cuda(mat->M, mat->N, csr.IRP, csr.JA, csr.AS, x);
-    // **Esecuzione su GPU (HLL)**
-    double *res_hll_cuda = spmv_hll_cuda(&hll, mat->M, mat->N, x);
-
-    printf("Calcoli terminati\n");
-
-    free(x);
-    freeHLLMatrix_cuda(&hll);
-    freeCSRMatrix(&csr);
-    free(mat->matrix);
-    free(mat);
-    free(res);
-    free(res_csr_cuda);
-    free(res_hll_cuda);
 
     return 0;
 }

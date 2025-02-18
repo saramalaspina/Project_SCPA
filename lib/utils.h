@@ -43,11 +43,15 @@ typedef struct {
 
 void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix);
 void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
-void freeHLLMatrix_openmp(HLLMatrix *hll);
-void freeHLLMatrix_cuda(HLLMatrix *hll);
-void freeCSRMatrix(CSRMatrix *csr);
 void trasponseHLLMatrix(HLLMatrix *hll);
-//void printHLLMatrixTransposed(const HLLMatrix *H);
+void printHLLMatrixTransposed(const HLLMatrix *H);
+
+//utils 
+double *generateVector(int N);
+void freeHLLMatrixOpenmp(HLLMatrix *hll);
+void freeHLLMatrixCuda(HLLMatrix *hll);
+void freeCSRMatrix(CSRMatrix *csr);
+void printResult(double *y, int M);
 
 // reader
 
@@ -64,19 +68,29 @@ MatrixConversionMediator createMatrixMediator();
 
 // serial product
 
-double *spmv_csr(int M, CSRMatrix *csr, double *x);
+double *prodSerial(int M, CSRMatrix *csr, double *x);
 
 // parallel product openmp
 
-double *spmv_csr_parallel(int M, CSRMatrix *csr, double *x);
-double *spmv_hll_parallel(HLLMatrix *hll, double *x);
+double *prodOpenmpCSR(int M, CSRMatrix *csr, double *x);
+double *prodOpenmpHLL(HLLMatrix *hll, double *x);
 
 // parallel product cuda
 
 #define THREADS_PER_BLOCK 256
 
-double *spmv_csr_cuda(int M, int N, int *IRP, int *JA, double *AS, double *x);
-double *spmv_hll_cuda(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
+double *prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x);
+double *prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
+
+// execution cuda 
+void serialExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
+void csrExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
+void hllExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
+
+// execution openmp 
+void serialExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
+void csrExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
+void hllExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
 
 #ifdef __cplusplus
 }
