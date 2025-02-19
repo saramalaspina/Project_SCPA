@@ -81,7 +81,7 @@ int file_is_empty(FILE *fp) {
     return size == 0;
 }
 
-void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral){
+void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral, int numThreads){
     double total_time = 0.0;
     char file[256];
     sprintf(file, "results/%s/performance.csv", paral);
@@ -108,7 +108,7 @@ void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, 
         if (file_is_empty(fp)) {
             fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops, nThreads\n");
         }
-        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops, omp_get_max_threads());
+        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops, numThreads);
     } else {
         if (file_is_empty(fp)) {
             fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops\n");

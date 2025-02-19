@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     printResult(y_serial, rows);
 
-    calculatePerformance(times, mat, matrix_name, "serial", "cuda");
+    calculatePerformance(times, mat, matrix_name, "serial", "cuda", 0);
     
     memset(times, 0, sizeof(times));
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "CSR", "cuda");
+    calculatePerformance(times, mat, matrix_name, "CSR", "cuda", 0);
 
     free(y_csr);
     free(elapsed_time_csr);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "HLL", "cuda");
+    calculatePerformance(times, mat, matrix_name, "HLL", "cuda", 0);
 
     free(elapsed_time_hll);
     free(y_serial);
