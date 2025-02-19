@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-void freeHLLMatrixCuda(HLLMatrix *hll) {
+void freeHLLMatrix(HLLMatrix *hll) {
     for (int b = 0; b < hll->num_blocks; b++) {
         for (int i = 0; i < hll->blocks[b].rows; i++) {
             free(hll->blocks[b].JA[i]);
@@ -11,20 +12,10 @@ void freeHLLMatrixCuda(HLLMatrix *hll) {
         }
         free(hll->blocks[b].JA);
         free(hll->blocks[b].AS);
-        free(hll->blocks[b].JA_t);
-        free(hll->blocks[b].AS_t);
-    }
-    free(hll->blocks);
-}
-
-void freeHLLMatrixOpenmp(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        for (int i = 0; i < hll->blocks[b].rows; i++) {
-            free(hll->blocks[b].JA[i]);
-            free(hll->blocks[b].AS[i]);
+        if(hll->blocks[b].JA_t != NULL && hll->blocks[b].AS_t != NULL){
+            free(hll->blocks[b].JA_t);
+            free(hll->blocks[b].AS_t);
         }
-        free(hll->blocks[b].JA);
-        free(hll->blocks[b].AS);
     }
     free(hll->blocks);
 }
@@ -81,4 +72,31 @@ void printResult(double *y, int M){
     for(int i=0; i<M; i++){
         printf("%lf\n", y[i]);
     }
+}
+
+void calculatePerformance(double *times, int nz){
+    double total_time = 0.0;
+
+    for (int i = 1; i < REPETITIONS; i++){
+        total_time += times[i];
+    }
+
+    total_time /= (REPETITIONS - 1); 
+    double time_ms = total_time * 1000;
+
+    double flops = (2.0 * nz) / total_time;
+    double gflops = flops / 1e9;
+
+    //scrittura nel csv
+    printf("Risultati: gflops %.17g\n", gflops);
+
+}
+
+int checkResults(double* arr1, double* arr2, int n) {
+    for (int i = 0; i < n; i++) {
+        if (fabs(arr1[i] - arr2[i]) > 1e-9) {
+            return 0; // Gli array sono diversi
+        }
+    }
+    return 1; // Gli array sono uguali
 }

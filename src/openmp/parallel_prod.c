@@ -20,8 +20,6 @@ void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
 
 
 void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y) {
-    int total_rows = hll->num_blocks * HACKSIZE;  // Numero totale di righe
-
     int chunk_size = 2;  // Regola per bilanciare il carico
 
     #pragma omp parallel for schedule(dynamic, chunk_size)

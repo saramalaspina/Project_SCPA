@@ -48,10 +48,11 @@ void printHLLMatrixTransposed(const HLLMatrix *H);
 
 //utils 
 double *generateVector(int N);
-void freeHLLMatrixOpenmp(HLLMatrix *hll);
-void freeHLLMatrixCuda(HLLMatrix *hll);
+void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void printResult(double *y, int M);
+void calculatePerformance(double *times, int nz);
+int checkResults(double* arr1, double* arr2, int n);
 
 // reader
 
@@ -79,19 +80,10 @@ void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
 
 #define THREADS_PER_BLOCK 256
 
-void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x);
-void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
+void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y, float *elapsed_time);
+void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x,  double *y, float *elapsed_time);
 
 #define REPETITIONS 5
-// execution cuda 
-void serialExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
-void csrExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
-void hllExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
-
-// execution openmp 
-void serialExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
-void csrExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
-void hllExecutionOpenmp(MatrixElement *mat, MatrixConversionMediator mediator);
 
 #ifdef __cplusplus
 }

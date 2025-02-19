@@ -17,7 +17,7 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y) {
+void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y, float *elapsed_time) {
     int *d_IRP, *d_JA;
     double *d_AS, *d_x, *d_y;
     
@@ -33,16 +33,25 @@ void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double 
     cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
 
     int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+
+    // Configurazione per il calcolo del tempo di esecuzione
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    cudaEventRecord(start, 0);
+
     spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
 
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        printf("CUDA error: %s\n", cudaGetErrorString(err));
-    }
-    cudaDeviceSynchronize(); 
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+ 
+    cudaEventElapsedTime(elapsed_time, start, stop);
     
     cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
     
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
     cudaFree(d_IRP);
     cudaFree(d_JA);
     cudaFree(d_AS);
@@ -69,13 +78,14 @@ __global__ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const dou
     }
 }
 
-void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x, double *y) {
+void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x, double *y, float *elapsed_time) {
     // Allocazione e copia del vettore x sul device
     double *d_x, *d_y;
     cudaMalloc(&d_x, total_cols * sizeof(double));
     cudaMalloc(&d_y, total_rows * sizeof(double));
     cudaMemcpy(d_x, x, total_cols * sizeof(double), cudaMemcpyHostToDevice);
 
+    *elapsed_time = 0.0f;
     int row_offset = 0;  // per posizionare i risultati parziali all’interno di y
 
     // Processa ciascun blocco HLL (ognuno contiene un blocco in formato ELLPACK)
@@ -101,10 +111,26 @@ void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const dou
 
         // Calcola la configurazione di esecuzione per il kernel
         int numBlocks = (rows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+
+        // Configurazione per il calcolo del tempo di esecuzione
+        cudaEvent_t start, stop;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+
+        cudaEventRecord(start, 0);
+
         // Il kernel scrive in d_y a partire da d_y + row_offset
         spmv_hll_kernel<<<numBlocks, THREADS_PER_BLOCK>>>(rows, max_nz, d_JA_t, d_AS_t, d_x, d_y + row_offset);
-        cudaDeviceSynchronize();
+        
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
 
+        float t = 0.0f;
+        cudaEventElapsedTime(&t, start, stop);
+        *elapsed_time += t;
+
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
         // Libera la memoria allocata per il blocco
         cudaFree(d_JA_t);
         cudaFree(d_AS_t);
