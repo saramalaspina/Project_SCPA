@@ -3,13 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double *prodOpenmpCSR(int M, CSRMatrix *csr, double *x) {
-    double *y = calloc(M, sizeof(double));  // Allocazione del risultato
-    if (!y) {
-        fprintf(stderr, "Errore di allocazione della memoria\n");
-        exit(1);
-    }
-
+void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
     int chunk_size = 8; // Imposta una dimensione di chunk ragionevole
 
     #pragma omp parallel for schedule(dynamic, chunk_size)
@@ -22,19 +16,11 @@ double *prodOpenmpCSR(int M, CSRMatrix *csr, double *x) {
 
         y[i] = sum;
     }
-
-    return y;
 }
 
 
-double *prodOpenmpHLL(HLLMatrix *hll, double *x) {
+void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y) {
     int total_rows = hll->num_blocks * HACKSIZE;  // Numero totale di righe
-
-    double *y = calloc(total_rows, sizeof(double));  // Allocazione dinamica
-    if (!y) {
-        fprintf(stderr, "Errore di allocazione della memoria\n");
-        exit(1);
-    }
 
     int chunk_size = 2;  // Regola per bilanciare il carico
 
@@ -52,8 +38,6 @@ double *prodOpenmpHLL(HLLMatrix *hll, double *x) {
             y[b * HACKSIZE + i] = sum;  // Scrittura senza conflitti
         }
     }
-
-    return y;
 }
 
 

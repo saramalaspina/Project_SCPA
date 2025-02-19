@@ -17,8 +17,7 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-double *prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x) {
-    double *y = (double *)malloc(M * sizeof(double));
+void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y) {
     int *d_IRP, *d_JA;
     double *d_AS, *d_x, *d_y;
     
@@ -49,8 +48,7 @@ double *prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x) {
     cudaFree(d_AS);
     cudaFree(d_x);
     cudaFree(d_y);
-    
-    return y;
+
 }
 
 //HLL
@@ -71,10 +69,7 @@ __global__ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const dou
     }
 }
 
-double *prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x) {
-    // Allocazione del vettore risultato sul host
-    double *y = (double*)malloc(total_rows * sizeof(double));
-
+void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x, double *y) {
     // Allocazione e copia del vettore x sul device
     double *d_x, *d_y;
     cudaMalloc(&d_x, total_cols * sizeof(double));
@@ -124,7 +119,6 @@ double *prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const 
     cudaFree(d_x);
     cudaFree(d_y);
 
-    return y;
 }
 
 

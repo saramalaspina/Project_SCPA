@@ -68,20 +68,21 @@ MatrixConversionMediator createMatrixMediator();
 
 // serial product
 
-double *prodSerial(int M, CSRMatrix *csr, double *x);
+void prodSerial(int M, CSRMatrix *csr, double *x, double *y);
 
 // parallel product openmp
 
-double *prodOpenmpCSR(int M, CSRMatrix *csr, double *x);
-double *prodOpenmpHLL(HLLMatrix *hll, double *x);
+void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y);
+void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
 
 // parallel product cuda
 
 #define THREADS_PER_BLOCK 256
 
-double *prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x);
-double *prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
+void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x);
+void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x);
 
+#define REPETITIONS 5
 // execution cuda 
 void serialExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);
 void csrExecutionCuda(MatrixElement *mat, MatrixConversionMediator mediator);

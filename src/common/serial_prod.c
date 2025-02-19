@@ -3,13 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double *prodSerial(int M, CSRMatrix *csr, double *x) {
-
-    double *y = calloc(M, sizeof(double));  // Allocazione del risultato
-    if (!y) {
-        fprintf(stderr, "Errore di allocazione della memoria\n");
-        exit(1);
-    }
+void prodSerial(int M, CSRMatrix *csr, double *x, double *y) {
 
     for (int i = 0; i < M; i++) {  // Scorre le righe della matrice
         double sum = 0.0;
@@ -21,7 +15,6 @@ double *prodSerial(int M, CSRMatrix *csr, double *x) {
         y[i] = sum;
     }
 
-    return y;
 }
 
 
