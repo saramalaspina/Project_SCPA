@@ -18,6 +18,14 @@ int main(int argc, char *argv[]) {
     int rows = mat->M;
     int cols = mat->N;
     int nz = mat->nz;
+    char *matrix_name;
+
+    matrix_name = strrchr(argv[1], '/');
+    if (matrix_name != NULL) {
+        matrix_name++; 
+    } else {
+        matrix_name = argv[1];
+    }
 
     //Creazione vettore x
     double *x = generateVector(cols);
@@ -54,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     printResult(y_serial, rows);
 
-    calculatePerformance(times, nz);
+    calculatePerformance(times, mat, matrix_name, "serial", "cuda");
     
     memset(times, 0, sizeof(times));
 
@@ -83,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, nz);
+    calculatePerformance(times, mat, matrix_name, "CSR", "cuda");
 
     free(y_csr);
     free(elapsed_time_csr);
@@ -122,7 +130,7 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, nz);
+    calculatePerformance(times, mat, matrix_name, "HLL", "cuda");
 
     free(elapsed_time_hll);
     free(y_serial);

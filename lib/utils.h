@@ -51,7 +51,7 @@ double *generateVector(int N);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void printResult(double *y, int M);
-void calculatePerformance(double *times, int nz);
+void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral);
 int checkResults(double* arr1, double* arr2, int n);
 
 // reader

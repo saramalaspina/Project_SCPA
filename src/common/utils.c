@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <omp.h>
 
 void freeHLLMatrix(HLLMatrix *hll) {
     for (int b = 0; b < hll->num_blocks; b++) {
@@ -74,8 +75,16 @@ void printResult(double *y, int M){
     }
 }
 
-void calculatePerformance(double *times, int nz){
+int file_is_empty(FILE *fp) {
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+    return size == 0;
+}
+
+void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral){
     double total_time = 0.0;
+    char file[256];
+    sprintf(file, "results/%s/performance.csv", paral);
 
     for (int i = 1; i < REPETITIONS; i++){
         total_time += times[i];
@@ -84,11 +93,29 @@ void calculatePerformance(double *times, int nz){
     total_time /= (REPETITIONS - 1); 
     double time_ms = total_time * 1000;
 
-    double flops = (2.0 * nz) / total_time;
+    double flops = (2.0 * mat->nz) / total_time;
     double gflops = flops / 1e9;
 
-    //scrittura nel csv
     printf("Risultati: gflops %.17g\n", gflops);
+
+    FILE *fp = fopen(file, "a");
+    if (fp == NULL) {
+        perror("Errore nell'apertura del file CSV");
+        return;
+    }
+
+    if(strcmp(paral, "openmp")==0){
+        if (file_is_empty(fp)) {
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops, nThreads\n");
+        }
+        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops, omp_get_max_threads());
+    } else {
+        if (file_is_empty(fp)) {
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops\n");
+        }
+        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops);
+    }
+    fclose(fp);    
 
 }
 
