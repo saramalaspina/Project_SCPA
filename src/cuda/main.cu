@@ -27,6 +27,11 @@ int main(int argc, char *argv[]) {
         matrix_name = argv[1];
     }
 
+    char *dot = strrchr(matrix_name, '.');
+    if (dot != NULL) {
+        *dot = '\0';
+    }
+    
     //Creazione vettore x
     double *x = generateVector(cols);
 
