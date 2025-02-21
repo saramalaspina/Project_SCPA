@@ -34,17 +34,20 @@ MATRICI=(
     "roadNet-PA.mtx"
 )
 
-echo "Compilazione ed esecuzione OpenMP..."
-make openmp
+echo "Caricamento moduli per CUDA..."
+module -s load gnu mpich cuda
+
+echo "Compilazione ed esecuzione CUDA..."
+make cuda
 if [ $? -ne 0 ]; then
-    echo "Errore nella compilazione OpenMP"
+    echo "Errore nella compilazione CUDA"
     exit 1
 fi
 
 # Itera sulla lista delle matrici
 for MATRIX_PATH in "${MATRICI[@]}"; do
-    echo "Eseguendo OpenMP per $MATRIX_PATH..."
-    ./bin/openmp "../matrix/$MATRIX_PATH"
+    echo "Eseguendo CUDA per $MATRIX_PATH..."
+    ./bin/cuda "../matrix/$MATRIX_PATH"
 done
 
-echo "Esecuzione OpenMP completata per tutte le matrici."
+echo "Esecuzione CUDA completata per tutte le matrici."
