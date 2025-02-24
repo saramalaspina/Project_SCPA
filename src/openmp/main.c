@@ -43,6 +43,24 @@ int main(int argc, char *argv[]) {
     double times[REPETITIONS];
     int i;
 
+    double *time_serial = (double *) malloc(sizeof(double));
+    if(time_serial == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double *time_csr = (double *) malloc(sizeof(double));
+    if(time_csr == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double *time_hll = (double *) malloc(sizeof(double));
+    if(time_hll == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
     //Creazione struct formato CSR
     CSRMatrix csr;
 
@@ -67,7 +85,7 @@ int main(int argc, char *argv[]) {
 
     printResult(y_serial, rows);
 
-    calculatePerformance(times, mat, matrix_name, "serial", "openmp", 1);
+    calculatePerformance(times, mat, matrix_name, "serial", "openmp", 1, time_serial);
     
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
@@ -95,7 +113,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "CSR", "openmp", omp_get_max_threads());
+    calculatePerformance(times, mat, matrix_name, "CSR", "openmp", omp_get_max_threads(), time_csr);
 
     free(y_csr);
     freeCSRMatrix(&csr);
@@ -132,8 +150,13 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "HLL", "openmp", omp_get_max_threads());
+    calculatePerformance(times, mat, matrix_name, "HLL", "openmp", omp_get_max_threads(), time_hll);
 
+    calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "openmp", omp_get_max_threads());
+
+    free(time_serial);
+    free(time_csr);
+    free(time_hll);
     free(y_serial);
     free(y_hll);
     freeHLLMatrix(&hll);

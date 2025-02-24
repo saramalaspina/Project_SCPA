@@ -81,7 +81,7 @@ int file_is_empty(FILE *fp) {
     return size == 0;
 }
 
-void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral, int numThreads){
+void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral, int numThreads, double *time){
     double total_time = 0.0;
     char file[256];
     sprintf(file, "results/%s/performance.csv", paral);
@@ -101,21 +101,23 @@ void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, 
     FILE *fp = fopen(file, "a");
     if (fp == NULL) {
         perror("Errore nell'apertura del file CSV");
-        return;
+        exit(1);
     }
 
     if(strcmp(paral, "openmp")==0){
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops, nThreads\n");
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, speedup, nThreads\n");
         }
-        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops, numThreads);
+        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
     } else {
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgFlops, avgGFlops\n");
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, speedup\n");
         }
-        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, flops, gflops);
+        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops);
     }
     fclose(fp);    
+
+    *time = time_ms;
 
 }
 
@@ -126,4 +128,37 @@ int checkResults(double* arr1, double* arr2, int n) {
         }
     }
     return 1; // Gli array sono uguali
+}
+
+void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads){
+    double total_time = 0.0;
+    char file[256];
+    sprintf(file, "results/%s/speedup.csv", paral);
+
+    double speedup_csr = time_serial/time_csr;
+    double speedup_hll = time_serial/time_hll;
+
+    printf("Speedup csr %.17g\n", speedup_csr);
+    printf("Speedup hll %.17g\n", speedup_hll);
+
+    FILE *fp = fopen(file, "a");
+    if (fp == NULL) {
+        perror("Errore nell'apertura del file CSV");
+        return;
+    }
+
+    if(strcmp(paral, "openmp")==0){
+        if (file_is_empty(fp)) {
+            fprintf(fp, "matrix, time_serial, speedup_csr, speedup_hll, nThreads\n");
+        }
+        fprintf(fp, "%s, %.6f, %.6f, %.6f, %d\n", matrix_name, time_serial, speedup_csr, speedup_hll, numThreads);
+    } else {
+        if (file_is_empty(fp)) {
+            fprintf(fp, "matrix, time_serial, speedup_csr, speedup_hll\n");
+        }
+        fprintf(fp, "%s, %.6f, %.6f, %.6f\n", matrix_name, time_serial, speedup_csr, speedup_hll);
+    }
+   
+    fclose(fp);    
+    
 }

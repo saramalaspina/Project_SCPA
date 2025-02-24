@@ -43,6 +43,24 @@ int main(int argc, char *argv[]) {
     double times[REPETITIONS];
     int i;
 
+    double *time_serial = (double *) malloc(sizeof(double));
+    if(time_serial == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double *time_csr = (double *) malloc(sizeof(double));
+    if(time_csr == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double *time_hll = (double *) malloc(sizeof(double));
+    if(time_hll == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
     //Creazione struct formato CSR
     CSRMatrix csr;
 
@@ -67,7 +85,7 @@ int main(int argc, char *argv[]) {
 
     printResult(y_serial, rows);
 
-    calculatePerformance(times, mat, matrix_name, "serial", "cuda", 0);
+    calculatePerformance(times, mat, matrix_name, "serial", "cuda", 0, time_serial);
     
     memset(times, 0, sizeof(times));
 
@@ -96,7 +114,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "CSR", "cuda", 0);
+    calculatePerformance(times, mat, matrix_name, "CSR", "cuda", 0, time_csr);
 
     free(y_csr);
     free(elapsed_time_csr);
@@ -135,8 +153,13 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "HLL", "cuda", 0);
+    calculatePerformance(times, mat, matrix_name, "HLL", "cuda", 0, time_hll);
 
+    calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "cuda", 0);
+
+    free(time_serial);
+    free(time_csr);
+    free(time_hll);
     free(elapsed_time_hll);
     free(y_serial);
     free(y_hll);
