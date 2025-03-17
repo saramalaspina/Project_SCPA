@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc-14
 CFLAGS = -O2 -Wall -Ilib
 OPENMP_FLAGS = -fopenmp 
 

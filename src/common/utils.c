@@ -106,12 +106,12 @@ void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, 
 
     if(strcmp(paral, "openmp")==0){
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, speedup, nThreads\n");
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, nThreads\n");
         }
         fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
     } else {
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, speedup\n");
+            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops\n");
         }
         fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops);
     }
