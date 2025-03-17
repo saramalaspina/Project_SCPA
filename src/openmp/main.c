@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
+
     //Creazione struct formato CSR
     CSRMatrix csr;
 
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
         times[i] = elapsed_time;
     }
 
-    printResult(y_serial, rows);
+    // printResult(y_serial, rows);
 
     calculatePerformance(times, mat, matrix_name, "serial", "openmp", 1, time_serial);
     

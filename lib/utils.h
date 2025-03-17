@@ -7,7 +7,7 @@ extern "C" {
 
 // converter
 
-#define HACKSIZE 32
+#define HACKSIZE 2048
 
 // Definizione COO
 typedef struct {
@@ -54,6 +54,7 @@ void printResult(double *y, int M);
 void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral, int numThreads, double *time);
 int checkResults(double* arr1, double* arr2, int n);
 void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads);
+int compareCOO(const void *a, const void *b);
 
 // reader
 

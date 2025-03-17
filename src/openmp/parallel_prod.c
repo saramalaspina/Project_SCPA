@@ -13,7 +13,6 @@ void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
         int start = csr->IRP[i];
         int end = csr->IRP[i + 1];
 
-        #pragma omp simd reduction(+:sum)
         for (int j = start; j < end; j++) {  // Scorre elementi non nulli della riga i
             sum += csr->AS[j] * x[csr->JA[j]];
         }
@@ -33,7 +32,6 @@ void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y) {
         for (int i = 0; i < block->rows; i++) {  // Per ogni riga del blocco
             double sum = 0.0;  // Variabile privata per ogni thread
 
-            #pragma omp simd reduction(+:sum)
             for (int j = 0; j < block->max_nz; j++) {  // Per ogni elemento non nullo
                 sum += block->AS[i][j] * x[block->JA[i][j]];
             }

@@ -1,1 +1,3 @@
-
+matrix, M, N, nz, type, avgTime, avgGFlops, nThreads
+Cube_Coup_dt0, 2164760, 2164760, 127206144, serial, 174.089500, 1.461388, 1
+Cube_Coup_dt0, 2164760, 2164760, 127206144, CSR, 409.048500, 0.621961, 8

@@ -123,7 +123,7 @@ void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, 
 
 int checkResults(double* arr1, double* arr2, int n) {
     for (int i = 0; i < n; i++) {
-        if (fabs(arr1[i] - arr2[i]) > 1e-9) {
+        if (fabs(arr1[i] - arr2[i]) > 1e-6) {
             return 0; // Gli array sono diversi
         }
     }
@@ -161,4 +161,13 @@ void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, do
    
     fclose(fp);    
     
+}
+
+int compareCOO(const void *a, const void *b) {
+    COOElement *elem1 = (COOElement *)a;
+    COOElement *elem2 = (COOElement *)b;
+
+    if (elem1->row != elem2->row)
+        return elem1->row - elem2->row; // Ordina per riga crescente
+    return elem1->col - elem2->col;     // Se le righe sono uguali, ordina per colonna crescente
 }

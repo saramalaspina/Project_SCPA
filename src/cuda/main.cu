@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
+    
     //Creazione struct formato CSR
     CSRMatrix csr;
 

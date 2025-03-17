@@ -15,7 +15,7 @@ MATRICI=(
     "rdist2.mtx"
     "cant.mtx"
     "olafu.mtx"
-    # "Cube_Coup_dt0.mtx"
+    "Cube_Coup_dt0.mtx"
     "ML_Laplace.mtx"
     "bcsstk17.mtx"
     "mac_econ_fwd500.mtx"
