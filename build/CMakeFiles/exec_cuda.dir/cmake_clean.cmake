@@ -2,8 +2,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/exec_cuda.dir/cmake_device_link.o"
   "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o"
   "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o.d"
-  "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mediator.c.o"
-  "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mediator.c.o.d"
   "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o"
   "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o.d"
   "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o"

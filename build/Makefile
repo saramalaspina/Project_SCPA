@@ -153,30 +153,6 @@ data/smalaspina/Project_SCPA/src/common/converter.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.s
 .PHONY : data/smalaspina/Project_SCPA/src/common/converter.c.s
 
-data/smalaspina/Project_SCPA/src/common/mediator.o: data/smalaspina/Project_SCPA/src/common/mediator.c.o
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.o
-
-# target to build an object file
-data/smalaspina/Project_SCPA/src/common/mediator.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mediator.c.o
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.c.o
-
-data/smalaspina/Project_SCPA/src/common/mediator.i: data/smalaspina/Project_SCPA/src/common/mediator.c.i
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.i
-
-# target to preprocess a source file
-data/smalaspina/Project_SCPA/src/common/mediator.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mediator.c.i
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.c.i
-
-data/smalaspina/Project_SCPA/src/common/mediator.s: data/smalaspina/Project_SCPA/src/common/mediator.c.s
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.s
-
-# target to generate assembly for a file
-data/smalaspina/Project_SCPA/src/common/mediator.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mediator.c.s
-.PHONY : data/smalaspina/Project_SCPA/src/common/mediator.c.s
-
 data/smalaspina/Project_SCPA/src/common/mmio.o: data/smalaspina/Project_SCPA/src/common/mmio.c.o
 .PHONY : data/smalaspina/Project_SCPA/src/common/mmio.o
 
@@ -333,9 +309,6 @@ help:
 	@echo "... data/smalaspina/Project_SCPA/src/common/converter.o"
 	@echo "... data/smalaspina/Project_SCPA/src/common/converter.i"
 	@echo "... data/smalaspina/Project_SCPA/src/common/converter.s"
-	@echo "... data/smalaspina/Project_SCPA/src/common/mediator.o"
-	@echo "... data/smalaspina/Project_SCPA/src/common/mediator.i"
-	@echo "... data/smalaspina/Project_SCPA/src/common/mediator.s"
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.o"
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.i"
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.s"
