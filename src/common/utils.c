@@ -48,10 +48,8 @@ int file_is_empty(FILE *fp) {
     return size == 0;
 }
 
-void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, char *type, char *paral, int numThreads, double *time){
+void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time){
     double total_time = 0.0;
-    char file[256];
-    sprintf(file, "results/%s/performance.csv", paral);
 
     for (int i = 1; i < REPETITIONS; i++){
         total_time += times[i];
@@ -65,28 +63,54 @@ void calculatePerformance(double *times, MatrixElement *mat, char *matrix_name, 
 
     printf("Risultati: gflops %.17g\n", gflops);
 
-    FILE *fp = fopen(file, "a");
+    FILE *fp = fopen("results/openmp/performance.csv", "a");
     if (fp == NULL) {
         perror("Errore nell'apertura del file CSV");
         exit(1);
     }
 
-    if(strcmp(paral, "openmp")==0){
-        if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, nThreads\n");
-        }
-        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
-    } else {
-        if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops\n");
-        }
-        fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops);
+    if (file_is_empty(fp)) {
+        fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, nThreads\n");
     }
+    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
+
     fclose(fp);    
 
     *time = time_ms;
 
 }
+
+void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_name, char *type, double *time){
+    double total_time = 0.0;
+
+    for (int i = 1; i < REPETITIONS; i++){
+        total_time += times[i];
+    }
+
+    total_time /= (REPETITIONS - 1); 
+
+    double flops = (2.0 * mat->nz) / (total_time/1000);
+    double gflops = flops / 1e9;
+
+    printf("Risultati: gflops %.17g\n", gflops);
+
+    FILE *fp = fopen("results/cuda/performance.csv", "a");
+    if (fp == NULL) {
+        perror("Errore nell'apertura del file CSV");
+        exit(1);
+    }
+  
+    if (file_is_empty(fp)) {
+        fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops\n");
+    }
+    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, total_time, gflops);
+
+    fclose(fp);    
+
+    *time = total_time;
+
+}
+
 
 int checkResults(double* arr1, double* arr2, int n) {
     for (int i = 0; i < n; i++) {

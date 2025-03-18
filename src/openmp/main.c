@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 
     // printResult(y_serial, rows);
 
-    calculatePerformance(times, mat, matrix_name, "serial", "openmp", 1, time_serial);
+    calculatePerformanceOpenMP(times, mat, matrix_name, "serial", 1, time_serial);
     
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "CSR", "openmp", omp_get_max_threads(), time_csr);
+    calculatePerformanceOpenMP(times, mat, matrix_name, "CSR", omp_get_max_threads(), time_csr);
 
     free(y_csr);
     freeCSRMatrix(csr);
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "HLL", "openmp", omp_get_max_threads(), time_hll);
+    calculatePerformanceOpenMP(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll);
 
     calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "openmp", omp_get_max_threads());
 

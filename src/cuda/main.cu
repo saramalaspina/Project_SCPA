@@ -76,12 +76,12 @@ int main(int argc, char *argv[]) {
         prodSerial(rows, csr, x, y_serial);   
         end_time = clock();
         double elapsed_time = (double)(end_time - start_time)/CLOCKS_PER_SEC;
-        times[i] = elapsed_time;
+        times[i] = elapsed_time * 1000;
     }
 
     // printResult(y_serial, rows);
 
-    calculatePerformance(times, mat, matrix_name, "serial", "cuda", 0, time_serial);
+    calculatePerformanceCuda(times, mat, matrix_name, "serial", time_serial);
     
     memset(times, 0, sizeof(times));
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
     printf("CSR results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "CSR", "cuda", 0, time_csr);
+    calculatePerformanceCuda(times, mat, matrix_name, "CSR", time_csr);
 
     free(y_csr);
     free(elapsed_time_csr);
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 
     printf("HLL results checked\n");
 
-    calculatePerformance(times, mat, matrix_name, "HLL", "cuda", 0, time_hll);
+    calculatePerformanceCuda(times, mat, matrix_name, "HLL", time_hll);
 
     calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "cuda", 0);
 

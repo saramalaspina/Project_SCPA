@@ -10,7 +10,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.26.5/CMakeCCompiler.cmake"
   "CMakeFiles/3.26.5/CMakeCUDACompiler.cmake"
   "CMakeFiles/3.26.5/CMakeSystem.cmake"
-  "/data/smalaspina/Project_SCPA/src/cuda/CMakeLists.txt"
+  "/data/sperelli/Project_SCPA/src/cuda/CMakeLists.txt"
   "/usr/share/cmake/Modules/CMakeCCompiler.cmake.in"
   "/usr/share/cmake/Modules/CMakeCCompilerABI.c"
   "/usr/share/cmake/Modules/CMakeCInformation.cmake"
