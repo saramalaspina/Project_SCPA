@@ -35,9 +35,6 @@ int main(int argc, char *argv[]) {
     //Creazione vettore x
     double *x = generateVector(cols);
 
-    //Creazione del mediatore
-    MatrixConversionMediator mediator = createMatrixMediator();
-
     //Variabili per misura delle prestazioni
     double start_time, end_time = 0.0;
     double times[REPETITIONS];
@@ -64,10 +61,7 @@ int main(int argc, char *argv[]) {
     qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
 
     //Creazione struct formato CSR
-    CSRMatrix csr;
-
-    //Conversione formato CSR
-    mediator.convertToCSR(mat->matrix, nz, rows, &csr);
+    CSRMatrix *csr = convertCOOtoCSR(mat->matrix, nz, rows);
 
     //Allocazione risultato seriale
     double *y_serial = calloc(rows, sizeof(double)); 
@@ -79,7 +73,7 @@ int main(int argc, char *argv[]) {
     //Calcolo seriale e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodSerial(rows, &csr, x, y_serial);   
+        prodSerial(rows, csr, x, y_serial);   
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -102,7 +96,7 @@ int main(int argc, char *argv[]) {
     //Calcolo parallelo openmp CSR e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodOpenmpCSR(rows, &csr, x, y_csr);   
+        prodOpenmpCSR(rows, csr, x, y_csr);   
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -118,16 +112,13 @@ int main(int argc, char *argv[]) {
     calculatePerformance(times, mat, matrix_name, "CSR", "openmp", omp_get_max_threads(), time_csr);
 
     free(y_csr);
-    freeCSRMatrix(&csr);
+    freeCSRMatrix(csr);
 
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
 
     // Creazione struct formato HLL
-    HLLMatrix hll;
-
-    mediator.convertToHLL(mat->matrix, mat->nz, mat->M, mat->N, &hll);
-    trasponseHLLMatrix(&hll);
+    HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE);
 
     //Allocazione risultato Openmp HLL 
     double *y_hll = calloc(rows, sizeof(double)); 
@@ -139,7 +130,7 @@ int main(int argc, char *argv[]) {
     //Calcolo parallelo openmp HLL e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodOpenmpHLL(&hll, x, y_hll);  
+        prodOpenmpHLL(hll, x, y_hll);  
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -161,7 +152,7 @@ int main(int argc, char *argv[]) {
     free(time_hll);
     free(y_serial);
     free(y_hll);
-    freeHLLMatrix(&hll);
+    freeHLLMatrix(hll);
     free(x);
     free(mat->matrix);
     free(mat);

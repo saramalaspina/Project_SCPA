@@ -7,7 +7,7 @@ extern "C" {
 
 // converter
 
-#define HACKSIZE 2048
+#define HACKSIZE 32
 
 // Definizione COO
 typedef struct {
@@ -20,19 +20,20 @@ typedef struct {
     COOElement *matrix;
 } MatrixElement;
 
+/* Struttura per un blocco in formato ELLPACK */
 typedef struct {
-    int rows;
-    int cols;
-    int max_nz;
-    int **JA;
-    double **AS;
-    int *JA_t;
-    double *AS_t;
-} ELLBlock;
+    int block_rows;   // Numero di righe del blocco (<= hackSize)
+    int N;            // Numero di colonne della matrice (uguale per tutte)
+    int maxnz;        // Massimo numero di non-zeri in una riga di questo blocco
+    int *JA;          // Array 1D (di dimensione block_rows*maxnz) degli indici di colonna
+    double *AS;       // Array 1D (di dimensione block_rows*maxnz) dei valori non-zero
+} EllpackBlock;
 
+/* Struttura per la matrice in formato HLL */
 typedef struct {
-    int num_blocks;
-    ELLBlock *blocks;
+    int hackSize;        // Parametro HackSize (es. 32)
+    int numBlocks;       // Numero di blocchi (M_totale/hackSize, ultimo blocco eventualmente ridotto)
+    EllpackBlock *blocks;// Array di blocchi in formato ELLPACK
 } HLLMatrix;
 
 typedef struct {
@@ -41,10 +42,8 @@ typedef struct {
     double *AS;
 } CSRMatrix;
 
-void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix);
-void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll);
-void trasponseHLLMatrix(HLLMatrix *hll);
-void printHLLMatrixTransposed(const HLLMatrix *H);
+CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m);
+HLLMatrix *convertCOOtoHLL(MatrixElement *coo, int hackSize);
 
 //utils 
 double *generateVector(int N);
@@ -60,15 +59,6 @@ int compareCOO(const void *a, const void *b);
 
 MatrixElement* read_matrix(char* filename);
 
-// mediator
-
-typedef struct {
-    void (*convertToCSR)(COOElement*, int, int, CSRMatrix*);
-    void (*convertToHLL)(COOElement*, int, int, int, HLLMatrix*);
-} MatrixConversionMediator;
-
-MatrixConversionMediator createMatrixMediator();
-
 // serial product
 
 void prodSerial(int M, CSRMatrix *csr, double *x, double *y);
@@ -82,8 +72,8 @@ void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
 
 #define THREADS_PER_BLOCK 256
 
-void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y, float *elapsed_time);
-void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x,  double *y, float *elapsed_time);
+void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
+void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
 
 #define REPETITIONS 5
 

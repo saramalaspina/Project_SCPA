@@ -6,19 +6,13 @@
 #include <omp.h>
 
 void freeHLLMatrix(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        for (int i = 0; i < hll->blocks[b].rows; i++) {
-            free(hll->blocks[b].JA[i]);
-            free(hll->blocks[b].AS[i]);
-        }
+    /* Liberazione della memoria allocata */
+    for (int b = 0; b < hll->numBlocks; b++) {
         free(hll->blocks[b].JA);
         free(hll->blocks[b].AS);
-        if(hll->blocks[b].JA_t != NULL && hll->blocks[b].AS_t != NULL){
-            free(hll->blocks[b].JA_t);
-            free(hll->blocks[b].AS_t);
-        }
     }
     free(hll->blocks);
+    free(hll);
 }
 
 double *generateVector(int N){
@@ -35,33 +29,6 @@ double *generateVector(int N){
     return x;
 }
 
-void printELLBlockTransposed(const ELLBlock *block) {
-    printf("JA_t (trasposta) =\n");
-    for (int r = 0; r < block->max_nz; r++) {
-        for (int c = 0; c < block->rows; c++) {
-            int idx = r * block->rows + c;
-            printf(" %d", block->JA_t[idx]);
-        }
-        printf("\n");
-    }
-    printf("AS_t (trasposta) =\n");
-    for (int r = 0; r < block->max_nz; r++) {
-        for (int c = 0; c < block->rows; c++) {
-            int idx = r * block->rows + c;
-            printf(" %.1f", block->AS_t[idx]);
-        }
-        printf("\n");
-    }
-}
-
-
-void printHLLMatrixTransposed(const HLLMatrix *H) {
-    printf("Transposed HLL Matrix with %d block(s)\n", H->num_blocks);
-    for (int b = 0; b < H->num_blocks; b++) {
-        printf("Block %d:\n", b);
-        printELLBlockTransposed(&H->blocks[b]);
-    }
-}
 
 void freeCSRMatrix(CSRMatrix *csr){
     free(csr->IRP);

@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Definizione COO->CSR Converter
-typedef struct {
-    void (*convert)(COOElement *coo, int nz, int m);
-} COOtoCSRConverter;
-
-void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix) {
+CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m) {
     printf("Converting COO to CSR...\n");
+    
+    CSRMatrix *matrix = (CSRMatrix *) malloc(sizeof(CSRMatrix));
+    if (!matrix) {
+        fprintf(stderr, "Errore di allocazione per CSRMatrix\n");
+        exit(EXIT_FAILURE);
+    }
 
     matrix->IRP = (int *)malloc((m + 1) * sizeof(int));
     matrix->JA = (int *)malloc(nz * sizeof(int));
@@ -45,136 +46,107 @@ void convertCOOtoCSR(COOElement *coo, int nz, int m, CSRMatrix *matrix) {
 
     free(row_counter);  // Rilascia la memoria allocata
 
-   /* // Stampa del formato CSR
-    printf("IRP: ");
-    for (int i = 0; i <= m; i++) {
-        printf("%d ", matrix->IRP[i]);
-    }
-    printf("\n");
-
-    printf("JA: ");
-    for (int i = 0; i < nz; i++) {
-        printf("%d ", matrix->JA[i]);
-    }
-    printf("\n");
-
-    printf("AS: ");
-    for (int i = 0; i < nz; i++) {
-        printf("%20.19g ", matrix->AS[i]);
-    }
-    printf("\n");*/
+    return matrix;
 
 }
 
-// Definizione COO->HLL Converter
-typedef struct {
-    void (*convert)(COOElement *coo, int nz, int m);
-} COOtoHLLConverter;
 
-
-void convertCOOtoHLL(COOElement *coo, int nz, int M, int N, HLLMatrix *hll) {
+/* Funzione di conversione da COO a HLL */
+HLLMatrix *convertCOOtoHLL(MatrixElement *coo, int hackSize) {
     printf("Converting COO to HLL...\n");
-    int num_blocks = (M + HACKSIZE - 1) / HACKSIZE;
-    hll->num_blocks = num_blocks;
-    hll->blocks = (ELLBlock *)malloc(num_blocks * sizeof(ELLBlock));
 
-    for (int b = 0; b < num_blocks; b++) {
-        int start_row = b * HACKSIZE;
-        int end_row = (start_row + HACKSIZE < M) ? (start_row + HACKSIZE) : M;
-        int block_rows = end_row - start_row;
-
-        int *row_nnz = (int *)calloc(block_rows, sizeof(int));
-        for (int i = 0; i < nz; i++) {
-            if (coo[i].row >= start_row && coo[i].row < end_row)
-                row_nnz[coo[i].row - start_row]++;
-        }
-
-        int max_nz = 0;
-        for (int i = 0; i < block_rows; i++) {
-            if (row_nnz[i] > max_nz) max_nz = row_nnz[i];
-        }
-
-        hll->blocks[b].rows = block_rows;
-        hll->blocks[b].cols = N;
-        hll->blocks[b].max_nz = max_nz;
-        hll->blocks[b].JA = (int **)malloc(block_rows * sizeof(int *));
-        hll->blocks[b].AS = (double **)malloc(block_rows * sizeof(double *));
-
-        for (int i = 0; i < block_rows; i++) {
-            hll->blocks[b].JA[i] = (int *)malloc(max_nz * sizeof(int));
-            hll->blocks[b].AS[i] = (double *)malloc(max_nz * sizeof(double));
-            memset(hll->blocks[b].JA[i], -1, max_nz * sizeof(int));
-            memset(hll->blocks[b].AS[i], 0, max_nz * sizeof(double));
-        }
-
-        int *current_nz = (int *)calloc(block_rows, sizeof(int));
-        for (int i = 0; i < nz; i++) {
-            int row = coo[i].row - start_row;
-            if (row >= 0 && row < block_rows) {
-                int pos = current_nz[row]++;
-                hll->blocks[b].JA[row][pos] = coo[i].col;
-                hll->blocks[b].AS[row][pos] = coo[i].value;
-            }
-        }
-
-        for (int i = 0; i < block_rows; i++) {
-            if (current_nz[i] > 0) {
-                for (int j = current_nz[i]; j < max_nz; j++) {
-                    hll->blocks[b].JA[i][j] = hll->blocks[b].JA[i][j - 1];
-                }
-            }
-        }        
-
-        /*printf("HLL Matrix with %d blocks\n", hll -> num_blocks);
-        for (int b = 0; b < hll -> num_blocks; b++) {
-            printf("Block %d:\n", b);
-            printf("JA =\n");
-            for (int i = 0; i < hll -> blocks[b].rows; i++) {
-                printf("  ");
-                for (int j = 0; j < hll -> blocks[b].max_nz; j++) {
-                    printf("%d ", hll -> blocks[b].JA[i][j]);
-                }
-                printf("\n");
-            }
-            printf("AS =\n");
-            for (int i = 0; i < hll -> blocks[b].rows; i++) {
-                printf("  ");
-                for (int j = 0; j < hll -> blocks[b].max_nz; j++) {
-                    printf("%.1f ", hll -> blocks[b].AS[i][j]);
-                }
-                printf("\n");
-            }
-        }*/
-
-        free(row_nnz);
-        free(current_nz);
-    }
-}
-
-
-void transposeELLBlock(ELLBlock *block) {
-    int rows = block->rows;
-    int max_nz = block->max_nz;
+    if (!coo || coo->nz < 0 || hackSize <= 0)
+        return NULL;
     
-    // Alloca gli array contigui per la versione trasposta
-    block->JA_t = malloc(rows * max_nz * sizeof(int));
-    block->AS_t = malloc(rows * max_nz * sizeof(double));
-    
-    // Esegui la trasposizione: per ogni elemento (r, c) nell'originale
-    // copia in posizione (c, r) nel vettore trasposto
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < max_nz; c++) {
-            block->JA_t[c * rows + r] = block->JA[r][c];
-            block->AS_t[c * rows + r] = block->AS[r][c];
-        }
+    // Calcolo il numero di blocchi necessari
+    int numBlocks = (coo->M + hackSize - 1) / hackSize;
+    HLLMatrix *hll = (HLLMatrix *) malloc(sizeof(HLLMatrix));
+    if (!hll) {
+        fprintf(stderr, "Errore di allocazione per HLLMatrix\n");
+        exit(EXIT_FAILURE);
     }
+    hll->hackSize = hackSize;
+    hll->numBlocks = numBlocks;
+    hll->blocks = (EllpackBlock *) malloc(numBlocks * sizeof(EllpackBlock));
+    if (!hll->blocks) {
+        fprintf(stderr, "Errore di allocazione per i blocchi ELLPACK\n");
+        free(hll);
+        exit(EXIT_FAILURE);
+    }
+    
+    /* coo_index tiene traccia della posizione corrente nell'array COO, 
+       sfruttando il fatto che la matrice è ordinata per riga */
+    int coo_index = 0;
+    for (int b = 0; b < numBlocks; b++) {
+        int startRow = b * hackSize;
+        int endRow = (b + 1) * hackSize;
+        if (endRow > coo->M)
+            endRow = coo->M;
+        int blockRows = endRow - startRow;
+        
+        /* Array temporaneo per memorizzare il numero di non-zeri per ogni riga del blocco */
+        int *nnz_per_row = (int *) calloc(blockRows, sizeof(int));
+        if (!nnz_per_row) {
+            fprintf(stderr, "Errore di allocazione per nnz_per_row\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        int block_maxnz = 0;
+        /* Conto i non-zeri per ogni riga (senza modificare coo_index) */
+        int temp_index = coo_index;
+        for (int i = 0; i < blockRows; i++) {
+            int currentRow = startRow + i;
+            int count = 0;
+            while (temp_index < coo->nz && coo->matrix[temp_index].row == currentRow) {
+                count++;
+                temp_index++;
+            }
+            nnz_per_row[i] = count;
+            if (count > block_maxnz)
+                block_maxnz = count;
+        }
+        
+        /* Allocazione degli array JA e AS per il blocco corrente.
+           Vengono allocati come array 1D di dimensione blockRows * block_maxnz. */
+        int *JA = (int *) malloc(blockRows * block_maxnz * sizeof(int));
+        double *AS = (double *) malloc(blockRows * block_maxnz * sizeof(double));
+        if (!JA || !AS) {
+            fprintf(stderr, "Errore di allocazione per gli array del blocco\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Inizializzo gli array: uso -1 in JA per indicare celle vuote e 0.0 in AS */
+        for (int i = 0; i < blockRows * block_maxnz; i++) {
+            JA[i] = -1;
+            AS[i] = 0.0;
+        }
+        
+        /* Riempio gli array JA e AS per ogni riga del blocco */
+        for (int i = 0; i < blockRows; i++) {
+            int currentRow = startRow + i;
+            int count = 0;
+            while (coo_index < coo->nz && coo->matrix[coo_index].row == currentRow) {
+                int index = i * block_maxnz + count;
+                JA[index] = coo->matrix[coo_index].col;
+                AS[index] = coo->matrix[coo_index].value;
+                count++;
+                coo_index++;
+            }
+        }
+        
+        /* Popolo il blocco nella struttura HLL */
+        hll->blocks[b].block_rows = blockRows;
+        hll->blocks[b].N = coo->N;
+        hll->blocks[b].maxnz = block_maxnz;
+        hll->blocks[b].JA = JA;
+        hll->blocks[b].AS = AS;
+        
+        free(nnz_per_row);
+    }
+    
+    return hll;
 }
 
-void trasponseHLLMatrix(HLLMatrix *hll) {
-    for (int b = 0; b < hll->num_blocks; b++) {
-        ELLBlock *block = &hll->blocks[b];
-        transposeELLBlock(block);
-    }
-}
+
 
 

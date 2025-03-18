@@ -23,22 +23,29 @@ void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
 
 
 void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y) {
-    int chunk_size = (hll->num_blocks > 500) ? 8 : (hll->num_blocks > 100) ? 4 : 2;
-
+    int chunk_size = (hll->numBlocks > 500) ? 8 : (hll->numBlocks > 100) ? 4 : 2;
+    
+    /* Parallelizzazione sul ciclo esterno (sui blocchi) */
     #pragma omp parallel for schedule(dynamic, chunk_size)
-    for (int b = 0; b < hll->num_blocks; b++) {  // Per ogni blocco
-        ELLBlock *block = &hll->blocks[b];
-
-        for (int i = 0; i < block->rows; i++) {  // Per ogni riga del blocco
-            double sum = 0.0;  // Variabile privata per ogni thread
-
-            for (int j = 0; j < block->max_nz; j++) {  // Per ogni elemento non nullo
-                sum += block->AS[i][j] * x[block->JA[i][j]];
+    for (int b = 0; b < hll->numBlocks; b++) {
+        EllpackBlock *block = &hll->blocks[b];
+        /* Il blocco b inizia dalla riga globale base = b * hackSize */
+        int base = b * hll->hackSize;
+        for (int i = 0; i < block->block_rows; i++) {
+            int global_row = base + i;
+            double sum = 0.0;
+            for (int j = 0; j < block->maxnz; j++) {
+                int idx = i * block->maxnz + j;
+                int col = block->JA[idx];
+                if (col != -1) {  // controllo che l'elemento sia valido
+                    sum += block->AS[idx] * x[col];
+                }
             }
-
-            y[b * HACKSIZE + i] = sum;  // Scrittura senza conflitti
+            y[global_row] = sum;
         }
     }
 }
+
+    
 
 

@@ -35,9 +35,6 @@ int main(int argc, char *argv[]) {
     //Creazione vettore x
     double *x = generateVector(cols);
 
-    //Creazione del mediatore
-    MatrixConversionMediator mediator = createMatrixMediator();
-
     //Variabili per misura delle prestazioni
     clock_t start_time, end_time;
     double times[REPETITIONS];
@@ -64,10 +61,7 @@ int main(int argc, char *argv[]) {
     qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
     
     //Creazione struct formato CSR
-    CSRMatrix csr;
-
-    //Conversione formato CSR
-    mediator.convertToCSR(mat->matrix, nz, rows, &csr);
+    CSRMatrix *csr = convertCOOtoCSR(mat->matrix, nz, rows);
 
     //Allocazione risultato seriale
     double *y_serial = (double *)calloc(rows, sizeof(double)); 
@@ -79,13 +73,13 @@ int main(int argc, char *argv[]) {
     //Calcolo seriale e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = clock();
-        prodSerial(rows, &csr, x, y_serial);   
+        prodSerial(rows, csr, x, y_serial);   
         end_time = clock();
         double elapsed_time = (double)(end_time - start_time)/CLOCKS_PER_SEC;
         times[i] = elapsed_time;
     }
 
-    printResult(y_serial, rows);
+    // printResult(y_serial, rows);
 
     calculatePerformance(times, mat, matrix_name, "serial", "cuda", 0, time_serial);
     
@@ -105,7 +99,7 @@ int main(int argc, char *argv[]) {
     }
     
     for (i = 0; i < REPETITIONS; i++) {
-        prodCudaCSR(rows, cols, csr.IRP, csr.JA, csr.AS, x, y_csr, elapsed_time_csr);  
+        prodCudaCSR(rows, cols, csr, x, y_csr, elapsed_time_csr);  
         times[i] = *elapsed_time_csr;
     }
 
@@ -120,15 +114,12 @@ int main(int argc, char *argv[]) {
 
     free(y_csr);
     free(elapsed_time_csr);
-    freeCSRMatrix(&csr);
+    freeCSRMatrix(csr);
 
     memset(times, 0, sizeof(times));
 
     // Creazione struct formato HLL
-    HLLMatrix hll;
-
-    mediator.convertToHLL(mat->matrix, mat->nz, mat->M, mat->N, &hll);
-    trasponseHLLMatrix(&hll);
+    HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE) ;
 
     //Allocazione risultato Openmp HLL 
     double *y_hll = (double *)calloc(rows, sizeof(double)); 
@@ -144,7 +135,7 @@ int main(int argc, char *argv[]) {
     }
     
     for (i = 0; i < REPETITIONS; i++) {
-        prodCudaHLL(&hll, mat->M, mat->N, x, y_hll, elapsed_time_hll); 
+        prodCudaHLL(hll, x, y_hll, rows, elapsed_time_hll); 
         times[i] = *elapsed_time_hll;
     }
 
@@ -165,7 +156,7 @@ int main(int argc, char *argv[]) {
     free(elapsed_time_hll);
     free(y_serial);
     free(y_hll);
-    freeHLLMatrix(&hll);
+    freeHLLMatrix(hll);
     free(x);
     free(mat->matrix);
     free(mat);

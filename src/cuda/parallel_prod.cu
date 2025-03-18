@@ -17,7 +17,11 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double *y, float *elapsed_time) {
+void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+    int *IRP = csr->IRP;
+    int *JA = csr->JA;
+    double *AS = csr->AS;
+
     int *d_IRP, *d_JA;
     double *d_AS, *d_x, *d_y;
     
@@ -62,89 +66,106 @@ void prodCudaCSR(int M, int N, int *IRP, int *JA, double *AS, double *x, double 
 
 //HLL
 
-__global__ void spmv_hll_kernel(int rows, int max_nz, const int *JA_t, const double *AS_t, const double *x, double *y) {
-    int row = blockIdx.x * blockDim.x + threadIdx.x;
-    if (row < rows) {
-        double sum = 0.0;
-        // Per ogni "colonna" (cioè ogni posizione nella riga ELLPACK)
-        for (int j = 0; j < max_nz; j++) {
-            // Poiché i dati sono trasposti, l’accesso è:
-            // elemento (row,j) in formato ELLPACK --> JA_t[j*rows + row] e AS_t[j*rows + row]
-            int col = JA_t[j * rows + row];
-            double val = AS_t[j * rows + row];
-            sum += val * x[col];
+/* Kernel CUDA per il prodotto matrice-vettore.
+   Ogni thread elabora una riga globale: calcola a quale blocco appartiene e l'indice locale,
+   quindi accumula il prodotto per tutti i non-zeri in quella riga. */
+__global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
+    int globalRow = blockIdx.x * blockDim.x + threadIdx.x;
+    if (globalRow >= totalRows) return;
+
+    // Determina il blocco e la riga locale in base a hackSize
+    int b = globalRow / hackSize;
+    int localRow = globalRow % hackSize;
+    if (localRow >= d_blocks[b].block_rows)
+        return; // nel caso dell'ultimo blocco che contiene meno righe
+
+    double sum = 0.0;
+    int maxnz = d_blocks[b].maxnz;
+    int rowStart = localRow * maxnz;
+    for (int j = 0; j < maxnz; j++) {
+        int col = d_blocks[b].JA[rowStart + j];
+        if (col != -1) {  // -1 indica una cella vuota
+            sum += d_blocks[b].AS[rowStart + j] * d_x[col];
         }
-        y[row] = sum;
     }
+    d_y[globalRow] = sum;
 }
 
-void prodCudaHLL(const HLLMatrix *hll, int total_rows, int total_cols, const double *x, double *y, float *elapsed_time) {
-    // Allocazione e copia del vettore x sul device
+
+void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
     double *d_x, *d_y;
-    cudaMalloc(&d_x, total_cols * sizeof(double));
-    cudaMalloc(&d_y, total_rows * sizeof(double));
-    cudaMemcpy(d_x, x, total_cols * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&d_x, totalRows * sizeof(double));
+    cudaMalloc((void**)&d_y, totalRows * sizeof(double));
+    cudaMemcpy(d_x, xHost, totalRows * sizeof(double), cudaMemcpyHostToDevice);
 
-    *elapsed_time = 0.0f;
-    int row_offset = 0;  // per posizionare i risultati parziali all’interno di y
+    // Allocazione dell'array dei blocchi su device
+    EllpackBlock *d_blocks;
+    cudaMalloc((void**)&d_blocks, hllHost->numBlocks * sizeof(EllpackBlock));
 
-    // Processa ciascun blocco HLL (ognuno contiene un blocco in formato ELLPACK)
-    for (int b = 0; b < hll->num_blocks; b++) {
-        // Puntatore al blocco corrente
-        ELLBlock *block = &(hll->blocks[b]);
-        int rows = block->rows;
-        int max_nz = block->max_nz;
+    // Preparo una copia host (temporanea) dei blocchi con i puntatori device
+    EllpackBlock *h_blocksDevice = (EllpackBlock *) malloc(hllHost->numBlocks * sizeof(EllpackBlock));
+    for (int b = 0; b < hllHost->numBlocks; b++) {
+        int sizeBlock = hllHost->blocks[b].block_rows * hllHost->blocks[b].maxnz;
+        int *d_JA;
+        double *d_AS;
+        cudaMalloc((void**)&d_JA, sizeBlock * sizeof(int));
+        cudaMalloc((void**)&d_AS, sizeBlock * sizeof(double));
+        // Copia dei dati degli array JA e AS per il blocco corrente
+        cudaMemcpy(d_JA, hllHost->blocks[b].JA, sizeBlock * sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_AS, hllHost->blocks[b].AS, sizeBlock * sizeof(double), cudaMemcpyHostToDevice);
 
-        // Dimensione dei dati trasposti per il blocco
-        size_t size_int = rows * max_nz * sizeof(int);
-        size_t size_double = rows * max_nz * sizeof(double);
+        // Imposto il blocco nel vettore temporaneo, con i puntatori aggiornati (device)
+        h_blocksDevice[b].block_rows = hllHost->blocks[b].block_rows;
+        h_blocksDevice[b].N = hllHost->blocks[b].N;
+        h_blocksDevice[b].maxnz = hllHost->blocks[b].maxnz;
+        h_blocksDevice[b].JA = d_JA;
+        h_blocksDevice[b].AS = d_AS;
+    }
+    // Copia dell'array dei blocchi (con i puntatori device) su device
+    cudaMemcpy(d_blocks, h_blocksDevice, hllHost->numBlocks * sizeof(EllpackBlock), cudaMemcpyHostToDevice);
 
-        // Alloca memoria sul device per JA_t e AS_t del blocco
-        int *d_JA_t;
-        double *d_AS_t;
-        cudaMalloc(&d_JA_t, size_int);
-        cudaMalloc(&d_AS_t, size_double);
+    // Costruisco la struttura HLLMatrix sul device
+    HLLMatrix hllDevice;
+    hllDevice.hackSize = hllHost->hackSize;
+    hllDevice.numBlocks = hllHost->numBlocks;
+    hllDevice.blocks = d_blocks;
+    HLLMatrix *d_hll;
+    cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
+    cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
 
-        // Copia dei dati del blocco sul device
-        cudaMemcpy(d_JA_t, block->JA_t, size_int, cudaMemcpyHostToDevice);
-        cudaMemcpy(d_AS_t, block->AS_t, size_double, cudaMemcpyHostToDevice);
+    // Lancio del kernel: un thread per riga globale
+    int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
-        // Calcola la configurazione di esecuzione per il kernel
-        int numBlocks = (rows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    // Configurazione per il calcolo del tempo di esecuzione
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    
+    cudaEventRecord(start, 0);
 
-        // Configurazione per il calcolo del tempo di esecuzione
-        cudaEvent_t start, stop;
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
+    spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+    
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+ 
+    cudaEventElapsedTime(elapsed_time, start, stop);
 
-        cudaEventRecord(start, 0);
+    // Copia del vettore risultato y da device a host
+    cudaMemcpy(yHost, d_y, totalRows * sizeof(double), cudaMemcpyDeviceToHost);
 
-        // Il kernel scrive in d_y a partire da d_y + row_offset
-        spmv_hll_kernel<<<numBlocks, THREADS_PER_BLOCK>>>(rows, max_nz, d_JA_t, d_AS_t, d_x, d_y + row_offset);
-        
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-
-        float t = 0.0f;
-        cudaEventElapsedTime(&t, start, stop);
-        *elapsed_time += t;
-
-        cudaEventDestroy(start);
-        cudaEventDestroy(stop);
-        // Libera la memoria allocata per il blocco
-        cudaFree(d_JA_t);
-        cudaFree(d_AS_t);
-
-        row_offset += rows;
+    // Liberazione della memoria device per ciascun blocco
+    for (int b = 0; b < hllHost->numBlocks; b++) {
+        cudaFree(h_blocksDevice[b].JA);
+        cudaFree(h_blocksDevice[b].AS);
     }
 
-    // Copia del vettore risultato dal device al host
-    cudaMemcpy(y, d_y, total_rows * sizeof(double), cudaMemcpyDeviceToHost);
-
-    // Libera la memoria sul device
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    free(h_blocksDevice);
+    cudaFree(d_blocks);
+    cudaFree(d_hll);
     cudaFree(d_x);
     cudaFree(d_y);
-
 }
 
 
