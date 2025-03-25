@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /data/sperelli/Project_SCPA/src/cuda
+CMAKE_SOURCE_DIR = /data/smalaspina/Project_SCPA/src/cuda
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /data/sperelli/Project_SCPA/build
+CMAKE_BINARY_DIR = /data/smalaspina/Project_SCPA/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/exec_cuda.dir/depend.make
@@ -69,82 +69,82 @@ include CMakeFiles/exec_cuda.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/exec_cuda.dir/flags.make
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o: CMakeFiles/exec_cuda.dir/flags.make
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o: /data/sperelli/Project_SCPA/src/common/converter.c
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o -MF CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o.d -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o -c /data/sperelli/Project_SCPA/src/common/converter.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o: CMakeFiles/exec_cuda.dir/flags.make
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o: /data/smalaspina/Project_SCPA/src/common/converter.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o -MF CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o.d -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o -c /data/smalaspina/Project_SCPA/src/common/converter.c
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.i"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/sperelli/Project_SCPA/src/common/converter.c > CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.i
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.i"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/smalaspina/Project_SCPA/src/common/converter.c > CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.i
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.s"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/sperelli/Project_SCPA/src/common/converter.c -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.s
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.s"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/smalaspina/Project_SCPA/src/common/converter.c -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.s
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o: CMakeFiles/exec_cuda.dir/flags.make
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o: /data/sperelli/Project_SCPA/src/common/mmio.c
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o -MF CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o.d -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o -c /data/sperelli/Project_SCPA/src/common/mmio.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o: CMakeFiles/exec_cuda.dir/flags.make
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o: /data/smalaspina/Project_SCPA/src/common/mmio.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o -MF CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o.d -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o -c /data/smalaspina/Project_SCPA/src/common/mmio.c
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.i"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/sperelli/Project_SCPA/src/common/mmio.c > CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.i
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.i"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/smalaspina/Project_SCPA/src/common/mmio.c > CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.i
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.s"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/sperelli/Project_SCPA/src/common/mmio.c -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.s
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.s"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/smalaspina/Project_SCPA/src/common/mmio.c -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.s
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o: CMakeFiles/exec_cuda.dir/flags.make
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o: /data/sperelli/Project_SCPA/src/common/reader.c
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o -MF CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o.d -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o -c /data/sperelli/Project_SCPA/src/common/reader.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o: CMakeFiles/exec_cuda.dir/flags.make
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o: /data/smalaspina/Project_SCPA/src/common/reader.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o -MF CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o.d -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o -c /data/smalaspina/Project_SCPA/src/common/reader.c
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.i"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/sperelli/Project_SCPA/src/common/reader.c > CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.i
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.i"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/smalaspina/Project_SCPA/src/common/reader.c > CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.i
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.s"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/sperelli/Project_SCPA/src/common/reader.c -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.s
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.s"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/smalaspina/Project_SCPA/src/common/reader.c -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.s
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o: CMakeFiles/exec_cuda.dir/flags.make
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o: /data/sperelli/Project_SCPA/src/common/serial_prod.c
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o -MF CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o.d -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o -c /data/sperelli/Project_SCPA/src/common/serial_prod.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o: CMakeFiles/exec_cuda.dir/flags.make
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o: /data/smalaspina/Project_SCPA/src/common/serial_prod.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o -MF CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o.d -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o -c /data/smalaspina/Project_SCPA/src/common/serial_prod.c
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.i"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/sperelli/Project_SCPA/src/common/serial_prod.c > CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.i
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.i"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/smalaspina/Project_SCPA/src/common/serial_prod.c > CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.i
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.s"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/sperelli/Project_SCPA/src/common/serial_prod.c -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.s
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.s"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/smalaspina/Project_SCPA/src/common/serial_prod.c -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.s
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o: CMakeFiles/exec_cuda.dir/flags.make
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o: /data/sperelli/Project_SCPA/src/common/utils.c
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o -MF CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o.d -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o -c /data/sperelli/Project_SCPA/src/common/utils.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o: CMakeFiles/exec_cuda.dir/flags.make
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o: /data/smalaspina/Project_SCPA/src/common/utils.c
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o -MF CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o.d -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o -c /data/smalaspina/Project_SCPA/src/common/utils.c
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.i"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/sperelli/Project_SCPA/src/common/utils.c > CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.i
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.i"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /data/smalaspina/Project_SCPA/src/common/utils.c > CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.i
 
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.s"
-	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/sperelli/Project_SCPA/src/common/utils.c -o CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.s
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.s"
+	/opt/gnu/13.3.0/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /data/smalaspina/Project_SCPA/src/common/utils.c -o CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.s
 
 CMakeFiles/exec_cuda.dir/main.cu.o: CMakeFiles/exec_cuda.dir/flags.make
 CMakeFiles/exec_cuda.dir/main.cu.o: CMakeFiles/exec_cuda.dir/includes_CUDA.rsp
-CMakeFiles/exec_cuda.dir/main.cu.o: /data/sperelli/Project_SCPA/src/cuda/main.cu
+CMakeFiles/exec_cuda.dir/main.cu.o: /data/smalaspina/Project_SCPA/src/cuda/main.cu
 CMakeFiles/exec_cuda.dir/main.cu.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CUDA object CMakeFiles/exec_cuda.dir/main.cu.o"
-	/opt/cuda/12.6/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/main.cu.o -MF CMakeFiles/exec_cuda.dir/main.cu.o.d -x cu -rdc=true -c /data/sperelli/Project_SCPA/src/cuda/main.cu -o CMakeFiles/exec_cuda.dir/main.cu.o
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CUDA object CMakeFiles/exec_cuda.dir/main.cu.o"
+	/opt/cuda/12.6/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/main.cu.o -MF CMakeFiles/exec_cuda.dir/main.cu.o.d -x cu -rdc=true -c /data/smalaspina/Project_SCPA/src/cuda/main.cu -o CMakeFiles/exec_cuda.dir/main.cu.o
 
 CMakeFiles/exec_cuda.dir/main.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/exec_cuda.dir/main.cu.i"
@@ -156,10 +156,10 @@ CMakeFiles/exec_cuda.dir/main.cu.s: cmake_force
 
 CMakeFiles/exec_cuda.dir/parallel_prod.cu.o: CMakeFiles/exec_cuda.dir/flags.make
 CMakeFiles/exec_cuda.dir/parallel_prod.cu.o: CMakeFiles/exec_cuda.dir/includes_CUDA.rsp
-CMakeFiles/exec_cuda.dir/parallel_prod.cu.o: /data/sperelli/Project_SCPA/src/cuda/parallel_prod.cu
+CMakeFiles/exec_cuda.dir/parallel_prod.cu.o: /data/smalaspina/Project_SCPA/src/cuda/parallel_prod.cu
 CMakeFiles/exec_cuda.dir/parallel_prod.cu.o: CMakeFiles/exec_cuda.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CUDA object CMakeFiles/exec_cuda.dir/parallel_prod.cu.o"
-	/opt/cuda/12.6/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/parallel_prod.cu.o -MF CMakeFiles/exec_cuda.dir/parallel_prod.cu.o.d -x cu -rdc=true -c /data/sperelli/Project_SCPA/src/cuda/parallel_prod.cu -o CMakeFiles/exec_cuda.dir/parallel_prod.cu.o
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CUDA object CMakeFiles/exec_cuda.dir/parallel_prod.cu.o"
+	/opt/cuda/12.6/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/exec_cuda.dir/parallel_prod.cu.o -MF CMakeFiles/exec_cuda.dir/parallel_prod.cu.o.d -x cu -rdc=true -c /data/smalaspina/Project_SCPA/src/cuda/parallel_prod.cu -o CMakeFiles/exec_cuda.dir/parallel_prod.cu.o
 
 CMakeFiles/exec_cuda.dir/parallel_prod.cu.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/exec_cuda.dir/parallel_prod.cu.i"
@@ -171,29 +171,29 @@ CMakeFiles/exec_cuda.dir/parallel_prod.cu.s: cmake_force
 
 # Object files for target exec_cuda
 exec_cuda_OBJECTS = \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o" \
 "CMakeFiles/exec_cuda.dir/main.cu.o" \
 "CMakeFiles/exec_cuda.dir/parallel_prod.cu.o"
 
 # External object files for target exec_cuda
 exec_cuda_EXTERNAL_OBJECTS =
 
-CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o
-CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o
-CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o
-CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o
-CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o
+CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o
+CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o
+CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o
+CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o
+CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/main.cu.o
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/parallel_prod.cu.o
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/build.make
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/deviceLinkLibs.rsp
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/deviceObjects1.rsp
 CMakeFiles/exec_cuda.dir/cmake_device_link.o: CMakeFiles/exec_cuda.dir/dlink.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CUDA device code CMakeFiles/exec_cuda.dir/cmake_device_link.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CUDA device code CMakeFiles/exec_cuda.dir/cmake_device_link.o"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/exec_cuda.dir/dlink.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -202,22 +202,22 @@ CMakeFiles/exec_cuda.dir/build: CMakeFiles/exec_cuda.dir/cmake_device_link.o
 
 # Object files for target exec_cuda
 exec_cuda_OBJECTS = \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o" \
-"CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o" \
+"CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o" \
 "CMakeFiles/exec_cuda.dir/main.cu.o" \
 "CMakeFiles/exec_cuda.dir/parallel_prod.cu.o"
 
 # External object files for target exec_cuda
 exec_cuda_EXTERNAL_OBJECTS =
 
-exec_cuda: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o
-exec_cuda: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o
-exec_cuda: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o
-exec_cuda: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o
-exec_cuda: CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o
+exec_cuda: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o
+exec_cuda: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o
+exec_cuda: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o
+exec_cuda: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o
+exec_cuda: CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o
 exec_cuda: CMakeFiles/exec_cuda.dir/main.cu.o
 exec_cuda: CMakeFiles/exec_cuda.dir/parallel_prod.cu.o
 exec_cuda: CMakeFiles/exec_cuda.dir/build.make
@@ -225,7 +225,7 @@ exec_cuda: CMakeFiles/exec_cuda.dir/cmake_device_link.o
 exec_cuda: CMakeFiles/exec_cuda.dir/linkLibs.rsp
 exec_cuda: CMakeFiles/exec_cuda.dir/objects1.rsp
 exec_cuda: CMakeFiles/exec_cuda.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/sperelli/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CUDA executable exec_cuda"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/data/smalaspina/Project_SCPA/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CUDA executable exec_cuda"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/exec_cuda.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -237,6 +237,6 @@ CMakeFiles/exec_cuda.dir/clean:
 .PHONY : CMakeFiles/exec_cuda.dir/clean
 
 CMakeFiles/exec_cuda.dir/depend:
-	cd /data/sperelli/Project_SCPA/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /data/sperelli/Project_SCPA/src/cuda /data/sperelli/Project_SCPA/src/cuda /data/sperelli/Project_SCPA/build /data/sperelli/Project_SCPA/build /data/sperelli/Project_SCPA/build/CMakeFiles/exec_cuda.dir/DependInfo.cmake --color=$(COLOR)
+	cd /data/smalaspina/Project_SCPA/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /data/smalaspina/Project_SCPA/src/cuda /data/smalaspina/Project_SCPA/src/cuda /data/smalaspina/Project_SCPA/build /data/smalaspina/Project_SCPA/build /data/smalaspina/Project_SCPA/build/CMakeFiles/exec_cuda.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/exec_cuda.dir/depend
 

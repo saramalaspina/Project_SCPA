@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     }
     
     for (i = 0; i < REPETITIONS; i++) {
-        prodCudaCSR(rows, cols, csr, x, y_csr, elapsed_time_csr);  
+        prodCudaCSRWarp(rows, cols, csr, x, y_csr, elapsed_time_csr);  
         times[i] = *elapsed_time_csr;
     }
 

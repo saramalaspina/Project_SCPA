@@ -64,6 +64,91 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 
 }
 
+//CSR con Warp 
+
+__global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+    int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
+    int lane = threadIdx.x % WARP_SIZE;
+
+    if (row < M) {
+        double sum = 0.0;
+        int row_start = IRP[row];
+        int row_end = IRP[row + 1];
+        
+        for (int j = row_start + lane; j < row_end; j += WARP_SIZE) {
+            sum += AS[j] * x[JA[j]];
+        }
+        
+        for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
+            sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
+        }
+        
+        if (lane == 0) y[row] = sum;
+    }
+}
+
+void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+    int *IRP = csr->IRP;
+    int *JA = csr->JA;
+    double *AS = csr->AS;
+
+    int *d_IRP, *d_JA;
+    double *d_AS, *d_x, *d_y;
+    
+    cudaMalloc(&d_IRP, (M + 1) * sizeof(int));
+    cudaMalloc(&d_JA, IRP[M] * sizeof(int));
+    cudaMalloc(&d_AS, IRP[M] * sizeof(double));
+    cudaMalloc(&d_x, N * sizeof(double));
+    cudaMalloc(&d_y, M * sizeof(double));
+    
+    cudaMemcpy(d_IRP, IRP, (M + 1) * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_JA, JA, IRP[M] * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_AS, AS, IRP[M] * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
+
+    int nz = csr->IRP[M];  // numero totale di non zeri
+    double avg_nz_row = (double)nz / M; // numero medio di non zeri per riga
+
+    // Configurazione per il calcolo del tempo di esecuzione
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    if (avg_nz_row < 32) {
+        // Lancia il kernel classico thread-per-row
+        int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+        cudaEventRecord(start, 0);
+
+        spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        cudaEventElapsedTime(elapsed_time, start, stop);
+
+    } else {
+        // Lancia il kernel warp-level: un warp per riga
+        int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+        cudaEventRecord(start, 0);
+
+        spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        cudaEventElapsedTime(elapsed_time, start, stop);
+    } 
+ 
+    cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
+    
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    cudaFree(d_IRP);
+    cudaFree(d_JA);
+    cudaFree(d_AS);
+    cudaFree(d_x);
+    cudaFree(d_y);
+
+}
+
 //HLL
 
 /* Kernel CUDA per il prodotto matrice-vettore.

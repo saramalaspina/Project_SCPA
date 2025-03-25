@@ -1,4 +1,4 @@
-CMakeFiles/exec_cuda.dir/parallel_prod.cu.o : /data/sperelli/Project_SCPA/src/cuda/parallel_prod.cu \
+CMakeFiles/exec_cuda.dir/parallel_prod.cu.o : /data/smalaspina/Project_SCPA/src/cuda/parallel_prod.cu \
     /usr/include/stdc-predef.h \
     /opt/cuda/12.6/bin/../targets/x86_64-linux/include/cuda_runtime.h \
     /opt/cuda/12.6/bin/../targets/x86_64-linux/include/crt/host_config.h \
@@ -156,4 +156,4 @@ CMakeFiles/exec_cuda.dir/parallel_prod.cu.o : /data/sperelli/Project_SCPA/src/cu
     /opt/gnu/13.3.0/include/c++/13.3.0/bits/move.h \
     /opt/gnu/13.3.0/include/c++/13.3.0/bits/utility.h \
     /opt/gnu/13.3.0/include/c++/13.3.0/initializer_list \
-    /data/sperelli/Project_SCPA/src/cuda/../../lib/utils.h
+    /data/smalaspina/Project_SCPA/src/cuda/../../lib/utils.h
