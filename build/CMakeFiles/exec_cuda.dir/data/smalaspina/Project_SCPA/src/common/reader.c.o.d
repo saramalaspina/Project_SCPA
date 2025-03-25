@@ -1,5 +1,5 @@
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o: \
- /data/sperelli/Project_SCPA/src/common/reader.c \
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o: \
+ /data/smalaspina/Project_SCPA/src/common/reader.c \
  /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/bits/libc-header-start.h /usr/include/features.h \
  /usr/include/features-time64.h /usr/include/bits/wordsize.h \
@@ -30,5 +30,5 @@ CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o: \
  /usr/include/bits/pthreadtypes-arch.h /usr/include/bits/struct_mutex.h \
  /usr/include/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/bits/stdlib-bsearch.h /usr/include/bits/stdlib-float.h \
- /data/sperelli/Project_SCPA/src/common/../../lib/mmio.h \
- /data/sperelli/Project_SCPA/src/common/../../lib/utils.h
+ /data/smalaspina/Project_SCPA/src/common/../../lib/mmio.h \
+ /data/smalaspina/Project_SCPA/src/common/../../lib/utils.h

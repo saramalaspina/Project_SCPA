@@ -75,7 +75,6 @@ void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
 #define WARP_SIZE 32
 
 void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
-void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
 void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
 
 #define REPETITIONS 5

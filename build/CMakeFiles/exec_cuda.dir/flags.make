@@ -5,7 +5,7 @@
 # compile CUDA with /opt/cuda/12.6/bin/nvcc
 C_DEFINES = 
 
-C_INCLUDES = -I/data/sperelli/Project_SCPA/src/cuda/../lib
+C_INCLUDES = -I/data/smalaspina/Project_SCPA/src/cuda/../lib
 
 C_FLAGS = -std=gnu11 -O3 -Wall -Wextra
 

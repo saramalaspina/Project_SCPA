@@ -66,7 +66,7 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 
 //CSR con Warp 
 
-/*__global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+/* __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
 
@@ -85,7 +85,7 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
         
         if (lane == 0) y[row] = sum;
     }     
-}*/
+} */
 
 __global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
      __shared__ double sdata[THREADS_PER_BLOCK];  
