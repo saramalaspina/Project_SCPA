@@ -114,7 +114,7 @@ void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    if (avg_nz_row < 25) {
+    if (avg_nz_row < 16) {
         // Lancia il kernel classico thread-per-row
         int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
         cudaEventRecord(start, 0);

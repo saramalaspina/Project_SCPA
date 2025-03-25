@@ -121,6 +121,7 @@ int checkResults(double* arr1, double* arr2, int n) {
     return 1; // Gli array sono uguali
 }
 
+
 void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads){
     double total_time = 0.0;
     char file[256];
