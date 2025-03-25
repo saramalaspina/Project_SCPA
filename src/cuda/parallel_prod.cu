@@ -66,7 +66,7 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 
 //CSR con Warp 
 
-__global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+/*__global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
 
@@ -85,6 +85,45 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
         
         if (lane == 0) y[row] = sum;
     }     
+}*/
+
+__global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
+     __shared__ double sdata[THREADS_PER_BLOCK];  
+    __shared__ int ptrs[THREADS_PER_BLOCK / WARP_SIZE][2];
+
+    const int thread_id = blockIdx.x * blockDim.x + threadIdx.x;  // ID globale del thread
+    const int thread_in_warp = threadIdx.x & (WARP_SIZE - 1);     // ID del thread dentro il warp
+    const int warp_id = thread_id / WARP_SIZE;                    // ID globale del warp
+    const int warp_in_block = threadIdx.x / WARP_SIZE;            // Warp ID locale nel blocco
+    const int num_warps = (THREADS_PER_BLOCK / WARP_SIZE) * gridDim.x;   // Numero totale di warps
+
+    // Ogni warp si occupa di una riga della matrice
+    for (int row = warp_id; row < num_rows; row += num_warps) {
+        // I primi due thread di ogni warp caricano gli indici di inizio/fine riga
+        if (thread_in_warp < 2) {
+            ptrs[warp_in_block][thread_in_warp] = d_row_ptr[row + thread_in_warp];
+        }
+        __syncthreads(); // Sincronizzazione per garantire che ptrs sia stato aggiornato
+
+        int row_start = ptrs[warp_in_block][0];  
+        int row_end = ptrs[warp_in_block][1];    
+
+        // Calcolo del prodotto locale
+        double sum = 0.0;
+        for (int j = row_start + thread_in_warp; j < row_end; j += WARP_SIZE) {
+            sum += d_values[j] * d_x[d_col_indices[j]];
+        }
+
+        // Riduzione all'interno del warp
+        for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
+            sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
+        }
+
+        // Il primo thread del warp scrive il risultato finale nella memoria globale
+        if (thread_in_warp == 0) {
+            d_y[row] = sum;
+        }
+    }
 }
 
 void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {

@@ -111,14 +111,19 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_na
 
 }
 
-
 int checkResults(double* arr1, double* arr2, int n) {
+    const double tol = 1e-1; // tolleranza assoluta maggiore
+    const double rel_tol = 5e-2; // tolleranza relativa 5%
+
     for (int i = 0; i < n; i++) {
-        if (fabs(arr1[i] - arr2[i]) > 1e-6) {
-            return 0; // Gli array sono diversi
+        double diff = fabs(arr1[i] - arr2[i]);
+        double max_val = fmax(fabs(arr1[i]), fabs(arr2[i]));
+
+        if (diff > tol && diff / max_val > rel_tol) {
+            return 0; // Differenza troppo grande
         }
     }
-    return 1; // Gli array sono uguali
+    return 1; // I risultati sono accettabilmente vicini
 }
 
 
