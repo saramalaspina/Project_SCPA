@@ -67,43 +67,24 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 //CSR con Warp 
 
 __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
-    // Shared memory per memorizzare i puntatori d'inizio e fine riga per ogni warp del blocco
-    __shared__ int ptrs[BLOCK_SIZE / WARP_SIZE][2];
+    int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
+    int lane = threadIdx.x % WARP_SIZE;
 
-    // Calcolo degli ID
-    const int thread_id = blockIdx.x * blockDim.x + threadIdx.x;      // ID globale del thread
-    const int thread_in_warp = threadIdx.x & (WARP_SIZE - 1);            // ID del thread nel warp
-    const int warp_id = thread_id / WARP_SIZE;                           // ID globale del warp (corrisponde a una riga)
-    const int warp_in_block = threadIdx.x / WARP_SIZE;                    // ID locale del warp nel blocco
-    const int num_warps = (BLOCK_SIZE / WARP_SIZE) * gridDim.x;           // Numero totale di warps
-
-    // Ogni warp processa una o più righe in maniera "straziata" nel caso in cui M > num_warps
-    for (int row = warp_id; row < M; row += num_warps) {
-        // I primi due thread di ogni warp caricano in shared memory i puntatori della riga corrente
-        if (thread_in_warp < 2) {
-            ptrs[warp_in_block][thread_in_warp] = IRP[row + thread_in_warp];
-        }
-        __syncthreads(); // Sincronizzazione per garantire che i puntatori siano aggiornati
-
-        int row_start = ptrs[warp_in_block][0];
-        int row_end   = ptrs[warp_in_block][1];
-
-        // Calcolo del prodotto riga-vettore: ogni thread del warp elabora i propri elementi
+    if (row < M) {
         double sum = 0.0;
-        for (int j = row_start + thread_in_warp; j < row_end; j += WARP_SIZE) {
+        int row_start = IRP[row];
+        int row_end = IRP[row + 1];
+        
+        for (int j = row_start + lane; j < row_end; j += WARP_SIZE) {
             sum += AS[j] * x[JA[j]];
         }
-
-        // Riduzione all'interno del warp in modo deterministico usando __shfl_down_sync
+        
         for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
             sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
         }
-
-        // Il primo thread del warp scrive il risultato della riga in memoria globale
-        if (thread_in_warp == 0) {
-            y[row] = sum;
-        }
-    }
+        
+        if (lane == 0) y[row] = sum;
+    }     
 }
 
 void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
