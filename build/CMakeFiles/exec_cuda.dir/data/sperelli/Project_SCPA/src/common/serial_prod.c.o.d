@@ -1,7 +1,7 @@
-CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o: \
- /data/smalaspina/Project_SCPA/src/common/converter.c \
+CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o: \
+ /data/sperelli/Project_SCPA/src/common/serial_prod.c \
  /usr/include/stdc-predef.h \
- /data/smalaspina/Project_SCPA/src/common/../../lib/utils.h \
+ /data/sperelli/Project_SCPA/src/common/../../lib/utils.h \
  /usr/include/stdio.h /usr/include/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/bits/wordsize.h /usr/include/bits/timesize.h \
@@ -30,6 +30,4 @@ CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o: 
  /usr/include/bits/pthreadtypes.h /usr/include/bits/thread-shared-types.h \
  /usr/include/bits/pthreadtypes-arch.h /usr/include/bits/struct_mutex.h \
  /usr/include/bits/struct_rwlock.h /usr/include/alloca.h \
- /usr/include/bits/stdlib-bsearch.h /usr/include/bits/stdlib-float.h \
- /usr/include/string.h /usr/include/bits/types/locale_t.h \
- /usr/include/bits/types/__locale_t.h /usr/include/strings.h
+ /usr/include/bits/stdlib-bsearch.h /usr/include/bits/stdlib-float.h
