@@ -105,10 +105,9 @@ int main(int argc, char *argv[]) {
 
     if(checkResults(y_serial, y_csr, rows) == 0){
         printf("Serial result is different from parallel result with csr\n");
-        //exit(1);
+    } else {
+        printf("CSR results checked\n");
     }
-
-    printf("CSR results checked\n");
 
     calculatePerformanceCuda(times, mat, matrix_name, "CSR", time_csr);
 
@@ -141,10 +140,9 @@ int main(int argc, char *argv[]) {
 
     if(checkResults(y_serial, y_hll, rows) == 0){
         printf("Serial result is different from parallel result with hll\n");
-        //exit(1);
+    } else {
+        printf("HLL results checked\n");
     }
-
-    printf("HLL results checked\n");
 
     calculatePerformanceCuda(times, mat, matrix_name, "HLL", time_hll);
 
