@@ -17,56 +17,9 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
-    int *IRP = csr->IRP;
-    int *JA = csr->JA;
-    double *AS = csr->AS;
-
-    int *d_IRP, *d_JA;
-    double *d_AS, *d_x, *d_y;
-    
-    cudaMalloc(&d_IRP, (M + 1) * sizeof(int));
-    cudaMalloc(&d_JA, IRP[M] * sizeof(int));
-    cudaMalloc(&d_AS, IRP[M] * sizeof(double));
-    cudaMalloc(&d_x, N * sizeof(double));
-    cudaMalloc(&d_y, M * sizeof(double));
-    
-    cudaMemcpy(d_IRP, IRP, (M + 1) * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_JA, JA, IRP[M] * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_AS, AS, IRP[M] * sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
-
-    int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-
-    // Configurazione per il calcolo del tempo di esecuzione
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-
-    cudaEventRecord(start, 0);
-
-    spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
-
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
- 
-    cudaEventElapsedTime(elapsed_time, start, stop);
-    
-    cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
-    
-    cudaEventDestroy(start);
-    cudaEventDestroy(stop);
-    cudaFree(d_IRP);
-    cudaFree(d_JA);
-    cudaFree(d_AS);
-    cudaFree(d_x);
-    cudaFree(d_y);
-
-}
-
 //CSR con Warp 
 
-/* __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+__global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
 
@@ -85,9 +38,9 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
         
         if (lane == 0) y[row] = sum;
     }     
-} */
+}
 
-__global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
+/*__global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
      __shared__ double sdata[THREADS_PER_BLOCK];  
     __shared__ int ptrs[THREADS_PER_BLOCK / WARP_SIZE][2];
 
@@ -124,9 +77,9 @@ __global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_in
             d_y[row] = sum;
         }
     }
-}
+}*/
 
-void prodCudaCSRWarp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
     int *IRP = csr->IRP;
     int *JA = csr->JA;
     double *AS = csr->AS;
@@ -215,6 +168,43 @@ __global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blo
     d_y[globalRow] = sum;
 }
 
+// Kernel ottimizzato con warp-level parallelism
+__global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
+    // Ogni warp elabora una riga globale
+    int warpId = (blockIdx.x * blockDim.x + threadIdx.x) / warpSize; // indice della riga globale
+    int lane   = threadIdx.x % warpSize;  // indice del thread all'interno del warp
+
+    if (warpId >= totalRows) return;
+
+    // Determina il blocco e la riga locale nel blocco HLL
+    int b = warpId / hackSize;
+    int localRow = warpId % hackSize;
+    if (localRow >= d_blocks[b].block_rows)
+        return;  // gestione del caso in cui l'ultimo blocco abbia meno righe
+
+    int maxnz = d_blocks[b].maxnz;
+    int rowStart = localRow * maxnz;
+
+    // Ogni lane elabora una parte degli elementi della riga:
+    double sum = 0.0;
+    for (int j = lane; j < maxnz; j += warpSize) {
+        int col = d_blocks[b].JA[rowStart + j];
+        if (col != -1) {  // -1 indica una cella vuota
+            sum += d_blocks[b].AS[rowStart + j] * d_x[col];
+        }
+    }
+
+    // Riduzione warp-level usando __shfl_down_sync per sommare le parziali
+    for (int offset = warpSize / 2; offset > 0; offset /= 2) {
+        sum += __shfl_down_sync(0xffffffff, sum, offset);
+    }
+
+    // Il thread lane 0 del warp scrive il risultato della riga
+    if (lane == 0) {
+        d_y[warpId] = sum;
+    }
+}
+
 
 void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
     double *d_x, *d_y;
@@ -257,22 +247,41 @@ void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, i
     cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
     cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
 
-    // Lancio del kernel: un thread per riga globale
-    int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    double avg_nz_row = computeAverageMaxnz(hllHost);
 
     // Configurazione per il calcolo del tempo di esecuzione
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     
-    cudaEventRecord(start, 0);
+    if(avg_nz_row < 16) {
+        // Lancio del kernel: un thread per riga globale
+        int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
-    spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+        cudaEventRecord(start, 0);
+
+        spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+     
+        cudaEventElapsedTime(elapsed_time, start, stop);
+
+    } else {
+        // Lancio del kernel: un warp per riga globale
+        int warpsPerBlock = THREADS_PER_BLOCK / WARP_SIZE; // 
+        int totalWarps = (totalRows + warpsPerBlock - 1) / warpsPerBlock;
+
+        cudaEventRecord(start, 0);
+
+        spmv_hll_kernel_warp<<<totalWarps, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
     
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
- 
-    cudaEventElapsedTime(elapsed_time, start, stop);
+        cudaEventElapsedTime(elapsed_time, start, stop);
+
+    }
 
     // Copia del vettore risultato y da device a host
     cudaMemcpy(yHost, d_y, totalRows * sizeof(double), cudaMemcpyDeviceToHost);
@@ -291,7 +300,5 @@ void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, i
     cudaFree(d_x);
     cudaFree(d_y);
 }
-
-
 
 
