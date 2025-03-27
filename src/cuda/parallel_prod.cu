@@ -220,10 +220,11 @@ __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *
 
 
 void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
+    int N = hllHost->blocks[0].N;
     double *d_x, *d_y;
     cudaMalloc((void**)&d_x, totalRows * sizeof(double));
     cudaMalloc((void**)&d_y, totalRows * sizeof(double));
-    cudaMemcpy(d_x, xHost, totalRows * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, xHost, N * sizeof(double), cudaMemcpyHostToDevice);
 
     // Allocazione dell'array dei blocchi su device
     EllpackBlock *d_blocks;
