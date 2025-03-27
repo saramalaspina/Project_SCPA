@@ -32,12 +32,15 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
             sum += AS[j] * x[JA[j]];
         }
         
+        // Riduzione in warp utilizzando solo i thread attivi
         for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
-            sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
+            sum += __shfl_down_sync(0xffffffff, sum, offset);
         }
         
-        if (lane == 0) y[row] = sum;
-    }     
+        if (lane == 0) {
+            y[row] = sum;
+        }     
+    }
 }
 
 /*__global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
@@ -142,6 +145,16 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 }
 
 //HLL
+
+double computeAverageMaxnz(const HLLMatrix *hllHost) {
+    int numBlocks = hllHost->numBlocks;
+    double sum = 0.0;
+    for (int b = 0; b < numBlocks; b++) {
+        sum += hllHost->blocks[b].maxnz;
+    }
+    return (numBlocks > 0) ? (sum / numBlocks) : 0.0;
+}
+
 
 /* Kernel CUDA per il prodotto matrice-vettore.
    Ogni thread elabora una riga globale: calcola a quale blocco appartiene e l'indice locale,

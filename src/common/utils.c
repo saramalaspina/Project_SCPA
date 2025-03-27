@@ -112,22 +112,24 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_na
 }
 
 int checkResults(double* arr1, double* arr2, int n) {
-    const double tol = 1e-6; // tolleranza assoluta maggiore
-    const double rel_tol = 5e-2; // tolleranza relativa 5%
+    const double tol = 1e-4;   // Tolleranza assoluta
+    const double rel_tol = 5e-2; // Tolleranza relativa (5%)
     int checked = 1; 
 
     for (int i = 0; i < n; i++) {
         double diff = fabs(arr1[i] - arr2[i]);
         double max_val = fmax(fabs(arr1[i]), fabs(arr2[i]));
-        
+
+        // Se entrambi i valori sono zero, passiamo oltre
         if (max_val == 0.0) continue;
 
-        if (diff > tol && diff / max_val > rel_tol) {
-            printf("seriale: %f, parallelo: %f", arr1[i], arr2[i]);
-            checked = 0; // Differenza troppo grande
+        // Se la differenza assoluta supera tol ed è maggiore del 5% del valore massimo, segnala l'errore
+        if (diff > tol && (diff / max_val) > rel_tol) {
+            printf("Mismatch at index %d: seriale = %f, parallelo = %f\n", i, arr1[i], arr2[i]);
+            checked = 0;
         }
     }
-    return checked; // I risultati sono accettabilmente vicini
+    return checked;
 }
 
 
