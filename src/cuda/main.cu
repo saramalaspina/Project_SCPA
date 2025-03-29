@@ -37,8 +37,13 @@ int main(int argc, char *argv[]) {
 
     //Variabili per misura delle prestazioni
     clock_t start_time, end_time;
-    double times[REPETITIONS];
     int i;
+
+    double *times = (double *)malloc(REPETITIONS * sizeof(double));
+    if (times == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
 
     double *time_serial = (double *) malloc(sizeof(double));
     if(time_serial == NULL) {
@@ -75,15 +80,14 @@ int main(int argc, char *argv[]) {
         start_time = clock();
         prodSerial(rows, csr, x, y_serial);   
         end_time = clock();
-        double elapsed_time = (double)(end_time - start_time)/CLOCKS_PER_SEC;
-        times[i] = elapsed_time * 1000;
+        times[i] = ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000;
     }
 
     // printResult(y_serial, rows);
 
     calculatePerformanceCuda(times, mat, matrix_name, "serial", time_serial);
     
-    memset(times, 0, sizeof(times));
+    memset(times, 0, REPETITIONS * sizeof(double));
 
     //Allocazione risultato CUDA CSR
     double *y_csr = (double *)calloc(rows, sizeof(double)); 
@@ -111,11 +115,11 @@ int main(int argc, char *argv[]) {
 
     calculatePerformanceCuda(times, mat, matrix_name, "CSR", time_csr);
 
+    memset(times, 0, REPETITIONS * sizeof(double));
+
     free(y_csr);
     free(elapsed_time_csr);
     freeCSRMatrix(csr);
-
-    memset(times, 0, sizeof(times));
 
     // Creazione struct formato HLL
     HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE) ;
@@ -148,6 +152,7 @@ int main(int argc, char *argv[]) {
 
     calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "cuda", 0);
 
+    free(times);
     free(time_serial);
     free(time_csr);
     free(time_hll);

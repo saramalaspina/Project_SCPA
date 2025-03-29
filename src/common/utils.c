@@ -111,7 +111,7 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_na
 
 }
 
-int checkResults(double* arr1, double* arr2, int n) {
+/*int checkResults(double* arr1, double* arr2, int n) {
     const double tol = 1e-4;   // Tolleranza assoluta
     const double rel_tol = 5e-2; // Tolleranza relativa (5%)
     int checked = 1; 
@@ -130,7 +130,31 @@ int checkResults(double* arr1, double* arr2, int n) {
         }
     }
     return checked;
+}*/
+
+
+int checkResults(double *y_serial, double *y_parallel, int size) {
+    double diff = 0.0;
+    double rel_diff = 0.0;
+    int passed = 1;
+
+    for (int i = 0; i < size; i++) {
+        double abs_diff = fabs(y_serial[i] - y_parallel[i]);
+        double max_val = fmax(fabs(y_serial[i]), fabs(y_parallel[i]));
+        double rel_diff_val = (max_val == 0) ? 0.0 : abs_diff / max_val;
+
+        diff = fmax(diff, abs_diff);
+        rel_diff = fmax(rel_diff, rel_diff_val);
+
+        if (abs_diff > 1e-4 && rel_diff_val > 1e-4) {
+            passed = 0;
+            printf("Differenza rilevata all'indice %d: seriale=%lf, parallelo=%lf (rel_diff=%lf)\n", i, y_serial[i], y_parallel[i], rel_diff_val);
+        }
+    }
+
+    return passed;
 }
+
 
 
 void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads){
