@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define WARP_SIZE 32
+
 //CSR
 
 __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
@@ -20,28 +22,55 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
 //CSR con Warp 
 
 __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
-    int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
+    int warp_id = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
+    int row = warp_id;  // Ogni warp lavora su una riga
+    int debugRow = 964468;
 
     if (row < M) {
         double sum = 0.0;
         int row_start = IRP[row];
-        int row_end = IRP[row + 1];
+        int row_end   = IRP[row + 1];
         
+        // Ogni lane elabora gli elementi in posizione row_start + lane + k*WARP_SIZE
         for (int j = row_start + lane; j < row_end; j += WARP_SIZE) {
-            sum += AS[j] * x[JA[j]];
+            double prod = AS[j] * x[JA[j]];
+            sum += prod;
+            if (row == debugRow) {
+                printf("Warp kernel - Debug row %d, lane %d: AS[%d]=%f, x[JA[%d]]=%f, prodotto=%f\n", 
+                       row, lane, j, AS[j], j, x[JA[j]], prod);
+            }
         }
         
-        // Riduzione in warp utilizzando solo i thread attivi
+        if (row == debugRow) {
+            printf("Warp kernel - Debug row %d, lane %d: parziale prima della riduzione = %f\n", row, lane, sum);
+        }
+        
+        // Riduzione in warp (usando solo le lane che hanno partecipato)
         for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
-            sum += __shfl_down_sync(0xffffffff, sum, offset);
+            double sum_before = sum;
+            double temp = __shfl_down_sync(__activemask(), sum, offset);
+            if (lane < offset) {   // Solo le lane che hanno un partner valido effettuano l'addizione
+                sum += temp;
+            }
+            if (row == debugRow) {
+                printf("Warp kernel - Debug row %d, lane %d: offset %d, sum_before = %f, temp = %f, sum_after = %f\n", 
+                       row, lane, offset, sum_before, temp, sum);
+            }
         }
         
+        if (row == debugRow && lane == 0) {
+            printf("Warp kernel - Debug row %d: somma finale dopo la riduzione = %f\n", row, sum);
+        }
+        
+        // La lane 0 del warp scrive il risultato
         if (lane == 0) {
             y[row] = sum;
-        }     
+        }
     }
 }
+
+
 
 /*__global__ void spmv_csr_warp_kernel(int num_rows, int *d_row_ptr, int *d_col_indices, double *d_values, double *d_x, double *d_y) {
      __shared__ double sdata[THREADS_PER_BLOCK];  
@@ -123,6 +152,7 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
     } else {
         // Lancia il kernel warp-level: un warp per riga
         int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+
         cudaEventRecord(start, 0);
 
         spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);

@@ -9,12 +9,11 @@ void prodSerial(int M, CSRMatrix *csr, double *x, double *y) {
         double sum = 0.0;
 
         for (int j = csr->IRP[i]; j < csr->IRP[i + 1]; j++) {  // Scorre gli elementi non nulli della riga i
+
             sum += csr->AS[j] * x[csr->JA[j]];
         }
-
         y[i] = sum;
     }
-
 }
 
 
