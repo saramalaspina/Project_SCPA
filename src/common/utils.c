@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <omp.h>
+#include <time.h>
 
 void freeHLLMatrix(HLLMatrix *hll) {
     /* Liberazione della memoria allocata */
@@ -15,7 +16,22 @@ void freeHLLMatrix(HLLMatrix *hll) {
     free(hll);
 }
 
-double *generateVector(int N){
+// Calcola un hash (che fungerà poi da seed) in base al nome della matrice considerata.
+unsigned int hash_string(const char *str) {
+    unsigned int hash = 5381;
+    int c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; // hash * 33 + ASCII carattere corrente
+
+    return hash;
+}
+
+double *generateVector(const char *matrix_name, int N) {
+    unsigned int seed = hash_string(matrix_name);
+    // Imposta il seed per la riproducibilità
+    srand(seed);
+
     // Allocazione dinamica del vettore x
     double *x = (double *)malloc(N * sizeof(double));
     if (!x) {
@@ -23,9 +39,11 @@ double *generateVector(int N){
         exit(1);
     }
 
+    // Popolamento con valori casuali tra 0.1 e 2.0
     for (int i = 0; i < N; i++) {
-        x[i] = 1.0;
+        x[i] = 0.1 + ((double)rand() / RAND_MAX) * (2.0 - 0.1);
     }
+    
     return x;
 }
 

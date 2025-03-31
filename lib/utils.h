@@ -46,7 +46,7 @@ CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m);
 HLLMatrix *convertCOOtoHLL(MatrixElement *coo, int hackSize);
 
 //utils 
-double *generateVector(int N);
+double *generateVector(const char *matrix_name, int N);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void printResult(double *y, int M);

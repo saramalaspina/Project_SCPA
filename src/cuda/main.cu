@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     }
     
     //Creazione vettore x
-    double *x = generateVector(cols);
+    double *x = generateVector(matrix_name, cols);
 
     //Variabili per misura delle prestazioni
     clock_t start_time, end_time;
