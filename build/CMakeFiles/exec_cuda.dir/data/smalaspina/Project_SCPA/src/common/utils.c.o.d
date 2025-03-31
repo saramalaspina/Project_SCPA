@@ -39,4 +39,7 @@ CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o: \
  /usr/include/bits/fp-fast.h \
  /usr/include/bits/mathcalls-helper-functions.h \
  /usr/include/bits/mathcalls.h \
- /opt/gnu/13.3.0/lib/gcc/x86_64-pc-linux-gnu/13.3.0/include/omp.h
+ /opt/gnu/13.3.0/lib/gcc/x86_64-pc-linux-gnu/13.3.0/include/omp.h \
+ /usr/include/time.h /usr/include/bits/time.h \
+ /usr/include/bits/types/struct_tm.h \
+ /usr/include/bits/types/struct_itimerspec.h

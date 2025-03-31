@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O2 -Wall -Ilib
-OPENMP_FLAGS = -fopenmp 
+OPENMP_FLAGS = -fopenmp -lm 
 
 COMMON_SRC = $(wildcard src/common/*.c) 
 OPENMP_SRC = $(wildcard src/openmp/*.c) 
