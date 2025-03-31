@@ -142,7 +142,7 @@ int checkResults(double *y_serial, double *y_parallel, int size) {
         diff = fmax(diff, abs_diff);
         rel_diff = fmax(rel_diff, rel_diff_val);
 
-        if (abs_diff > 1e-4 && rel_diff_val > 1e-4) {
+        if (abs_diff > 1e-9 && rel_diff_val > 1e-6) {
             passed = 0;
             printf("Mismatch at index %d: seriale = %f, parallelo = %f (rel_diff=%lf)\n", i, y_serial[i], y_parallel[i], rel_diff_val);
         }
