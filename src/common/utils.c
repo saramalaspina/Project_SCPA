@@ -98,6 +98,33 @@ void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_
 
 }
 
+int binary_search_csr(const int *IRP, int size, int target) {
+    int low = 0;
+    int high = size;
+    while (low < high) {
+        int mid = low + (high - low) / 2;
+        if (IRP[mid] <= target) {
+            low = mid + 1;
+        } else {
+            high = mid;
+        }
+    }
+    return low - 1;
+}
+
+void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds) {
+    int total_nnz = csr->IRP[M];
+    int target_nnz_per_thread = (total_nnz + num_threads - 1) / num_threads;
+
+    row_bounds[0] = 0;
+    // Per ogni thread, determina il confine di riga in base al target cumulativo
+    for (int t = 1; t < num_threads; t++) {
+        int target = t * target_nnz_per_thread;
+        row_bounds[t] = binary_search_csr(csr->IRP, M + 1, target);
+    }
+    row_bounds[num_threads] = M;
+}
+
 void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
     double total_time = 0.0;
 

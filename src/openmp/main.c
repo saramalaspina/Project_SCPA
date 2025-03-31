@@ -93,10 +93,19 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    int num_threads = omp_get_max_threads();
+    int *row_bounds = malloc((num_threads + 1) * sizeof(int));
+    if (row_bounds == NULL) {
+        fprintf(stderr, "Errore di allocazione per row_bounds.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    compute_row_bounds(csr, rows, num_threads, row_bounds);
+
     //Calcolo parallelo openmp CSR e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodOpenmpCSR(rows, csr, x, y_csr);   
+        prodOpenmpCSR(rows, csr, x, y_csr, row_bounds);   
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -156,6 +165,7 @@ int main(int argc, char *argv[]) {
     free(x);
     free(mat->matrix);
     free(mat);
+    free(row_bounds);
 
     return 0;
 }

@@ -55,6 +55,7 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *mat
 int checkResults(double *y_serial, double *y_parallel, int size);
 void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* paral, int numThreads);
 int compareCOO(const void *a, const void *b);
+void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
 
 // reader
 
@@ -66,7 +67,7 @@ void prodSerial(int M, CSRMatrix *csr, double *x, double *y);
 
 // parallel product openmp
 
-void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y);
+void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds);
 void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
 
 // parallel product cuda

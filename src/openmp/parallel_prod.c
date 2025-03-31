@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
+/*void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
     int chunk_size = (M > 10000) ? 256 : 8;
 
     #pragma omp parallel for schedule(dynamic, chunk_size)
@@ -18,6 +18,42 @@ void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
         }
 
         y[i] = sum;
+    }
+}*/
+
+/*void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y) {
+
+    #pragma omp parallel for schedule(guided, 1)
+    for (int i = 0; i < M; i++) {
+        double sum = 0.0;
+        int start = csr->IRP[i];
+        int end = csr->IRP[i + 1];
+
+        for (int j = start; j < end; j++) {
+            sum += csr->AS[j] * x[csr->JA[j]];
+        }
+        y[i] = sum;
+    }
+}*/
+
+
+
+void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds) {
+    int num_threads = omp_get_max_threads();
+
+    #pragma omp parallel num_threads(num_threads)
+    {
+        int tid = omp_get_thread_num();
+        for (int i = row_bounds[tid]; i < row_bounds[tid+1]; i++) {
+            double sum = 0.0;
+            int start = csr->IRP[i];
+            int end   = csr->IRP[i+1];
+
+            for (int j = start; j < end; j++) {
+                sum += csr->AS[j] * x[csr->JA[j]];
+            }
+            y[i] = sum;
+        }
     }
 }
 
