@@ -51,9 +51,9 @@ void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void printResult(double *y, int M);
 void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time);
-void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_name, char *type, double *time);
+void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
 int checkResults(double *y_serial, double *y_parallel, int size);
-void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads);
+void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* paral, int numThreads);
 int compareCOO(const void *a, const void *b);
 
 // reader

@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
     //Allocazione risultato Openmp HLL 
     double *y_hll = (double *)calloc(rows, sizeof(double)); 
-    if (!y_serial) {
+    if (!y_hll) {
         fprintf(stderr, "Memory allocation error\n");
         exit(1);
     }

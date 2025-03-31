@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WARP_SIZE 32
+#define MAX_NZ_PER_ROW 256
 
 //CSR
 
@@ -22,6 +22,28 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
 //CSR con Warp 
 
 __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+    int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
+    int lane = threadIdx.x % WARP_SIZE;
+
+    if (row < M) {
+        double sum = 0.0;
+        int row_start = IRP[row];
+        int row_end = IRP[row + 1];
+        
+        for (int j = row_start + lane; j < row_end; j += WARP_SIZE) {
+            sum += AS[j] * x[JA[j]];
+        }
+        
+        for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
+            sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
+        }
+        
+        if (lane == 0) y[row] = sum;
+    }     
+}
+
+
+__global__ void spmv_csr_warp_kernel_debug(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int warp_id = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
     int row = warp_id;  // Ogni warp lavora su una riga
@@ -67,6 +89,55 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
         if (lane == 0) {
             y[row] = sum;
         }
+    }
+}
+
+//funziona!
+__global__ void spmv_csr_warp_kernel_ordered(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
+    // Calcola l'ID globale del warp: ogni warp lavora su una riga
+    int global_warp_id = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
+    int lane = threadIdx.x % WARP_SIZE;
+    
+    if (global_warp_id >= M) return; // se il warp supera il numero di righe, esce
+    
+    int row = global_warp_id;
+    int row_start = IRP[row];
+    int row_end   = IRP[row + 1];
+    int row_length = row_end - row_start;
+    
+    // Ogni warp usa una porzione della shared memory:
+    // calcola l’indice del warp all’interno del blocco
+    int warp_in_block = threadIdx.x / WARP_SIZE;
+    // La shared memory dinamica è organizzata in blocchi per warp:
+    // ogni warp ha MAX_NZ_PER_ROW double
+    extern __shared__ double shared_contrib[]; 
+    double *my_shared = shared_contrib + warp_in_block * MAX_NZ_PER_ROW;
+    
+    // Ogni lane processa in modo straziato gli elementi della riga e li scrive in posizione "j - row_start"
+    for (int j = row_start + lane; j < row_end; j += WARP_SIZE) {
+         int pos = j - row_start;  // posizione relativa nella riga
+         my_shared[pos] = AS[j] * x[JA[j]];
+         // Puoi stampare per debug se necessario:
+         // if (row == 964468)
+         //     printf("Ordered kernel - row %d, lane %d: j=%d, pos=%d, AS[j]=%f, x[JA[j]]=%f, prodotto=%f\n", 
+         //            row, lane, j, pos, AS[j], x[JA[j]], my_shared[pos]);
+    }
+    
+    // Sincronizza il warp (le lane della stessa riga)
+    __syncwarp();
+    
+    // La lane 0 esegue la somma sequenziale in ordine
+    if (lane == 0) {
+         double sum = 0.0;
+         // Somma in ordine da 0 a row_length-1, esattamente come nel prodotto seriale
+         for (int pos = 0; pos < row_length; pos++) {
+              sum += my_shared[pos];
+         }
+         y[row] = sum;
+         // Stampiamo il risultato per la riga di debug, se necessario
+         if (row == 964468) {
+              printf("Ordered reduction - Debug row %d: somma finale = %f\n", row, sum);
+         }
     }
 }
 
@@ -145,6 +216,13 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 
         spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
 
+        // Controlla errori di lancio kernel
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+           fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
+           exit(EXIT_FAILURE);
+        }
+
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
         cudaEventElapsedTime(elapsed_time, start, stop);
@@ -156,6 +234,13 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
         cudaEventRecord(start, 0);
 
         spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+        
+        // Controlla errori di lancio kernel
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
+            exit(EXIT_FAILURE);
+        }
 
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
@@ -306,6 +391,13 @@ void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, i
 
         spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
+        // Controlla errori di lancio kernel
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
+            exit(EXIT_FAILURE);
+        }
+
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
      
@@ -319,6 +411,12 @@ void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, i
         cudaEventRecord(start, 0);
 
         spmv_hll_kernel_warp<<<totalWarps, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
+            exit(EXIT_FAILURE);
+        }
 
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);

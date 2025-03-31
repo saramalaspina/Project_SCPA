@@ -80,7 +80,7 @@ void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_
 
 }
 
-void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_name, char *type, double *time){
+void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
     double total_time = 0.0;
 
     for (int i = 1; i < REPETITIONS; i++){
@@ -111,28 +111,6 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, char *matrix_na
 
 }
 
-/*int checkResults(double* arr1, double* arr2, int n) {
-    const double tol = 1e-4;   // Tolleranza assoluta
-    const double rel_tol = 5e-2; // Tolleranza relativa (5%)
-    int checked = 1; 
-
-    for (int i = 0; i < n; i++) {
-        double diff = fabs(arr1[i] - arr2[i]);
-        double max_val = fmax(fabs(arr1[i]), fabs(arr2[i]));
-
-        // Se entrambi i valori sono zero, passiamo oltre
-        if (max_val == 0.0) continue;
-
-        // Se la differenza assoluta supera tol ed è maggiore del 5% del valore massimo, segnala l'errore
-        if (diff > tol && (diff / max_val) > rel_tol) {
-            printf("Mismatch at index %d: seriale = %f, parallelo = %f\n", i, arr1[i], arr2[i]);
-            checked = 0;
-        }
-    }
-    return checked;
-}*/
-
-
 int checkResults(double *y_serial, double *y_parallel, int size) {
     double diff = 0.0;
     double rel_diff = 0.0;
@@ -148,7 +126,7 @@ int checkResults(double *y_serial, double *y_parallel, int size) {
 
         if (abs_diff > 1e-4 && rel_diff_val > 1e-4) {
             passed = 0;
-            printf("Differenza rilevata all'indice %d: seriale=%lf, parallelo=%lf (rel_diff=%lf)\n", i, y_serial[i], y_parallel[i], rel_diff_val);
+            printf("Mismatch at index %d: seriale = %f, parallelo = %f (rel_diff=%lf)\n", i, y_serial[i], y_parallel[i], rel_diff_val);
         }
     }
 
@@ -157,8 +135,7 @@ int checkResults(double *y_serial, double *y_parallel, int size) {
 
 
 
-void calculateSpeedup(char *matrix_name, double time_serial, double time_csr, double time_hll, char *paral, int numThreads){
-    double total_time = 0.0;
+void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* paral, int numThreads){
     char file[256];
     sprintf(file, "results/%s/speedup.csv", paral);
 
