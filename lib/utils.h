@@ -50,10 +50,10 @@ double *generateVector(const char *matrix_name, int N);
 void freeHLLMatrix(HLLMatrix *hll);
 void freeCSRMatrix(CSRMatrix *csr);
 void printResult(double *y, int M);
-void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time);
+void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
 void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
 int checkResults(double *y_serial, double *y_parallel, int size);
-void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* paral, int numThreads);
+void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads);
 int compareCOO(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
 

@@ -66,7 +66,7 @@ int file_is_empty(FILE *fp) {
     return size == 0;
 }
 
-void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time){
+void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
     double total_time = 0.0;
 
     for (int i = 1; i < REPETITIONS; i++){
@@ -81,7 +81,7 @@ void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_
 
     printf("Risultati: gflops %.17g\n", gflops);
 
-    FILE *fp = fopen("results/openmp/performance.csv", "a");
+    FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
         perror("Errore nell'apertura del file CSV");
         exit(1);
@@ -90,7 +90,7 @@ void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_
     if (file_is_empty(fp)) {
         fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, nThreads\n");
     }
-    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n",matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
+    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n", matrix_name, mat->M, mat->N, mat->nz, type, time_ms, gflops, numThreads);
 
     fclose(fp);    
 
@@ -180,9 +180,7 @@ int checkResults(double *y_serial, double *y_parallel, int size) {
 
 
 
-void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* paral, int numThreads){
-    char file[256];
-    sprintf(file, "results/%s/speedup.csv", paral);
+void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads){
 
     double speedup_csr = time_serial/time_csr;
     double speedup_hll = time_serial/time_hll;
@@ -196,7 +194,7 @@ void calculateSpeedup(const char* matrix_name, double time_serial, double time_c
         return;
     }
 
-    if(strcmp(paral, "openmp")==0){
+    if(numThreads != 0){
         if (file_is_empty(fp)) {
             fprintf(fp, "matrix, time_serial, speedup_csr, speedup_hll, nThreads\n");
         }
