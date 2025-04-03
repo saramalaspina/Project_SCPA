@@ -1,4 +1,5 @@
 #!/bin/bash
+MODE=0  # esecuzione con una sola configurazione di threads
 
 > results/openmp/performance.csv
 > results/openmp/speedup.csv
@@ -47,7 +48,7 @@ fi
 # Itera sulla lista delle matrici
 for MATRIX_PATH in "${MATRICI[@]}"; do
     echo "Eseguendo OpenMP per $MATRIX_PATH..."
-    ./bin/openmp "../matrix/$MATRIX_PATH"
+    ./bin/openmp "../matrix/$MATRIX_PATH" $MODE
 done
 
 echo "Esecuzione OpenMP completata per tutte le matrici."

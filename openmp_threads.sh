@@ -1,4 +1,5 @@
 #!/bin/bash
+MODE=1  # esecuzione con tutte le configurazioni di threads
 
 > results/openmp/performance_threads.csv
 > results/openmp/speedup_threads.csv
@@ -38,7 +39,7 @@ MATRICI=(
 )
 
 echo "Compilazione ed esecuzione OpenMP..."
-make openmp_t
+make openmp
 if [ $? -ne 0 ]; then
     echo "Errore nella compilazione OpenMP"
     exit 1
@@ -47,7 +48,7 @@ fi
 # Itera sulla lista delle matrici
 for MATRIX_PATH in "${MATRICI[@]}"; do
     echo "Eseguendo OpenMP con tutti i thread per $MATRIX_PATH..."
-    ./bin/openmp_t "../matrix/$MATRIX_PATH" 
+    ./bin/openmp "../matrix/$MATRIX_PATH" $MODE
 done
 
 echo "Esecuzione OpenMP completata per tutte le matrici."
