@@ -42,19 +42,19 @@ typedef struct {
     double *AS;
 } CSRMatrix;
 
-CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m);
-HLLMatrix *convertCOOtoHLL(MatrixElement *coo, int hackSize);
+CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m);
+HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize);
 
 //utils 
-double *generateVector(const char *matrix_name, int N);
-void freeHLLMatrix(HLLMatrix *hll);
-void freeCSRMatrix(CSRMatrix *csr);
-void printResult(double *y, int M);
-void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
-void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
-int checkResults(double *y_serial, double *y_parallel, int size);
-void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads);
-int compareCOO(const void *a, const void *b);
+double *generate_vector(const char *matrix_name, int N);
+void free_hll_matrix(HLLMatrix *hll);
+void free_csr_matrix(CSRMatrix *csr);
+void print_result(double *y, int M);
+void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
+int check_results(double *y_serial, double *y_parallel, int size);
+void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads);
+int compare_coo(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
 
 // reader
@@ -63,20 +63,20 @@ MatrixElement* read_matrix(char* filename);
 
 // serial product
 
-void prodSerial(int M, CSRMatrix *csr, double *x, double *y);
+void prod_serial(int M, CSRMatrix *csr, double *x, double *y);
 
 // parallel product openmp
 
-void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds);
-void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y);
+void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds);
+void prod_openmp_hll(HLLMatrix *hll, double *x, double *y);
 
 // parallel product cuda
 
 #define THREADS_PER_BLOCK 256
 #define WARP_SIZE 32
 
-void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
-void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
+void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
+void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
 
 #define REPETITIONS 5
 

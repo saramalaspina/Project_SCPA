@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m) {
+CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m) {
     printf("Converting COO to CSR...\n");
     
     CSRMatrix *matrix = (CSRMatrix *) malloc(sizeof(CSRMatrix));
@@ -52,7 +52,7 @@ CSRMatrix *convertCOOtoCSR(COOElement *coo, int nz, int m) {
 
 
 /* Funzione di conversione da COO a HLL */
-HLLMatrix *convertCOOtoHLL(MatrixElement *coo, int hackSize) {
+HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize) {
     printf("Converting COO to HLL...\n");
 
     if (!coo || coo->nz < 0 || hackSize <= 0)

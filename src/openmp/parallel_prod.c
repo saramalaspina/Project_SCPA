@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <omp.h>
 
-void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds) {
+void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds) {
     int num_threads = omp_get_max_threads();
 
     #pragma omp parallel num_threads(num_threads)
@@ -24,7 +24,7 @@ void prodOpenmpCSR(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds)
 }
 
 
-void prodOpenmpHLL(HLLMatrix *hll, double *x, double *y) {
+void prod_openmp_hll(HLLMatrix *hll, double *x, double *y) {
 
     /* Parallelizzazione sul ciclo esterno (sui blocchi) */
     #pragma omp parallel for schedule(guided)

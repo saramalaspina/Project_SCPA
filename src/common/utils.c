@@ -6,7 +6,7 @@
 #include <omp.h>
 #include <time.h>
 
-void freeHLLMatrix(HLLMatrix *hll) {
+void free_hll_matrix(HLLMatrix *hll) {
     /* Liberazione della memoria allocata */
     for (int b = 0; b < hll->numBlocks; b++) {
         free(hll->blocks[b].JA);
@@ -27,7 +27,7 @@ unsigned int hash_string(const char *str) {
     return hash;
 }
 
-double *generateVector(const char *matrix_name, int N) {
+double *generate_vector(const char *matrix_name, int N) {
     unsigned int seed = hash_string(matrix_name);
     // Imposta il seed per la riproducibilità
     srand(seed);
@@ -48,13 +48,13 @@ double *generateVector(const char *matrix_name, int N) {
 }
 
 
-void freeCSRMatrix(CSRMatrix *csr){
+void free_csr_matrix(CSRMatrix *csr){
     free(csr->IRP);
     free(csr->JA);
     free(csr->AS);
 }
 
-void printResult(double *y, int M){
+void print_result(double *y, int M){
     for(int i=0; i<M; i++){
         printf("%lf\n", y[i]);
     }
@@ -66,7 +66,7 @@ int file_is_empty(FILE *fp) {
     return size == 0;
 }
 
-void calculatePerformanceOpenMP(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
+void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
     double total_time = 0.0;
 
     for (int i = 1; i < REPETITIONS; i++){
@@ -125,7 +125,7 @@ void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds)
     row_bounds[num_threads] = M;
 }
 
-void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
     double total_time = 0.0;
 
     for (int i = 1; i < REPETITIONS; i++){
@@ -156,7 +156,7 @@ void calculatePerformanceCuda(double *times, MatrixElement *mat, const char *mat
 
 }
 
-int checkResults(double *y_serial, double *y_parallel, int size) {
+int check_results(double *y_serial, double *y_parallel, int size) {
     double diff = 0.0;
     double rel_diff = 0.0;
     int passed = 1;
@@ -180,7 +180,7 @@ int checkResults(double *y_serial, double *y_parallel, int size) {
 
 
 
-void calculateSpeedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads){
+void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads){
 
     double speedup_csr = time_serial/time_csr;
     double speedup_hll = time_serial/time_hll;
@@ -210,7 +210,7 @@ void calculateSpeedup(const char* matrix_name, double time_serial, double time_c
     
 }
 
-int compareCOO(const void *a, const void *b) {
+int compare_coo(const void *a, const void *b) {
     COOElement *elem1 = (COOElement *)a;
     COOElement *elem2 = (COOElement *)b;
 

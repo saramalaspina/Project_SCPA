@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     }
     
     //Creazione vettore x
-    double *x = generateVector(matrix_name, cols);
+    double *x = generate_vector(matrix_name, cols);
 
     //Variabili per misura delle prestazioni
     clock_t start_time, end_time;
@@ -63,10 +63,10 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
+    qsort(mat->matrix, nz, sizeof(COOElement), compare_coo);
     
     //Creazione struct formato CSR
-    CSRMatrix *csr = convertCOOtoCSR(mat->matrix, nz, rows);
+    CSRMatrix *csr = convert_coo_to_csr(mat->matrix, nz, rows);
 
     //Allocazione risultato seriale
     double *y_serial = (double *)calloc(rows, sizeof(double)); 
@@ -78,14 +78,14 @@ int main(int argc, char *argv[]) {
     //Calcolo seriale e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = clock();
-        prodSerial(rows, csr, x, y_serial);   
+        prod_serial(rows, csr, x, y_serial);
         end_time = clock();
         times[i] = ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000;
     }
 
     // printResult(y_serial, rows);
 
-    calculatePerformanceCuda(times, mat, matrix_name, "serial", time_serial);
+    calculate_performance_cuda(times, mat, matrix_name, "serial", time_serial);
     
     memset(times, 0, REPETITIONS * sizeof(double));
 
@@ -103,26 +103,26 @@ int main(int argc, char *argv[]) {
     }
     
     for (i = 0; i < REPETITIONS; i++) {
-        prodCudaCSR(rows, cols, csr, x, y_csr, elapsed_time_csr);  
+        prod_cuda_csr(rows, cols, csr, x, y_csr, elapsed_time_csr);
         times[i] = *elapsed_time_csr;
     }
 
-    if(checkResults(y_serial, y_csr, rows) == 0){
+    if(check_results(y_serial, y_csr, rows) == 0){
         printf("Serial result is different from parallel result with csr\n");
     } else {
         printf("CSR results checked\n");
     }
 
-    calculatePerformanceCuda(times, mat, matrix_name, "CSR", time_csr);
+    calculate_performance_cuda(times, mat, matrix_name, "CSR", time_csr);
 
     memset(times, 0, REPETITIONS * sizeof(double));
 
     free(y_csr);
     free(elapsed_time_csr);
-    freeCSRMatrix(csr);
+    free_csr_matrix(csr);
 
     // Creazione struct formato HLL
-    HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE) ;
+    HLLMatrix *hll = convert_coo_to_hll(mat, HACKSIZE) ;
 
     //Allocazione risultato Openmp HLL 
     double *y_hll = (double *)calloc(rows, sizeof(double)); 
@@ -138,19 +138,19 @@ int main(int argc, char *argv[]) {
     }
     
     for (i = 0; i < REPETITIONS; i++) {
-        prodCudaHLL(hll, x, y_hll, rows, elapsed_time_hll); 
+        prod_cuda_hll(hll, x, y_hll, rows, elapsed_time_hll);
         times[i] = *elapsed_time_hll;
     }
 
-    if(checkResults(y_serial, y_hll, rows) == 0){
+    if(check_results(y_serial, y_hll, rows) == 0){
         printf("Serial result is different from parallel result with hll\n");
     } else {
         printf("HLL results checked\n");
     }
 
-    calculatePerformanceCuda(times, mat, matrix_name, "HLL", time_hll);
+    calculate_performance_cuda(times, mat, matrix_name, "HLL", time_hll);
 
-    calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/cuda/speedup.csv", 0);
+    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/cuda/speedup.csv", 0);
 
     free(times);
     free(time_serial);
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
     free(elapsed_time_hll);
     free(y_serial);
     free(y_hll);
-    freeHLLMatrix(hll);
+    free_hll_matrix(hll);
     free(x);
     free(mat->matrix);
     free(mat);

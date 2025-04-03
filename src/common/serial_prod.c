@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void prodSerial(int M, CSRMatrix *csr, double *x, double *y) {
+void prod_serial(int M, CSRMatrix *csr, double *x, double *y) {
 
     for (int i = 0; i < M; i++) {  // Scorre le righe della matrice
         double sum = 0.0;

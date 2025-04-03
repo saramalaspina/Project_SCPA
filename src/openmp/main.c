@@ -11,7 +11,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     int nz = mat->nz;
     
     //Creazione vettore x
-    double *x = generateVector(matrix_name, cols);
+    double *x = generate_vector(matrix_name, cols);
 
     //Variabili per misura delle prestazioni
     double start_time, end_time = 0.0;
@@ -39,10 +39,10 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         exit(EXIT_FAILURE);
     }
 
-    qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
+    qsort(mat->matrix, nz, sizeof(COOElement), compare_coo);
 
     //Creazione struct formato CSR
-    CSRMatrix *csr = convertCOOtoCSR(mat->matrix, nz, rows);
+    CSRMatrix *csr = convert_coo_to_csr(mat->matrix, nz, rows);
 
     //Allocazione risultato seriale
     double *y_serial = calloc(rows, sizeof(double)); 
@@ -54,7 +54,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     //Calcolo seriale e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodSerial(rows, csr, x, y_serial);   
+        prod_serial(rows, csr, x, y_serial);
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -62,7 +62,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
 
     // printResult(y_serial, rows);
 
-    calculatePerformanceOpenMP(times, mat, matrix_name, "serial", 1, time_serial, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "serial", 1, time_serial, filename_p);
     
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
@@ -86,29 +86,29 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     //Calcolo parallelo openmp CSR e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodOpenmpCSR(rows, csr, x, y_csr, row_bounds);   
+        prod_openmp_csr(rows, csr, x, y_csr, row_bounds);
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
     }
 
-    if(checkResults(y_serial, y_csr, rows) == 0){
+    if(check_results(y_serial, y_csr, rows) == 0){
         printf("Serial result is different from parallel result with csr\n");
         exit(1);
     }
 
     printf("CSR results checked\n");
 
-    calculatePerformanceOpenMP(times, mat, matrix_name, "CSR", omp_get_max_threads(), time_csr, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "CSR", omp_get_max_threads(), time_csr, filename_p);
 
     free(y_csr);
-    freeCSRMatrix(csr);
+    free_csr_matrix(csr);
 
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
 
     // Creazione struct formato HLL
-    HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE);
+    HLLMatrix *hll = convert_coo_to_hll(mat, HACKSIZE);
 
     //Allocazione risultato Openmp HLL 
     double *y_hll = calloc(rows, sizeof(double)); 
@@ -120,29 +120,29 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     //Calcolo parallelo openmp HLL e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodOpenmpHLL(hll, x, y_hll);  
+        prod_openmp_hll(hll, x, y_hll);
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
     }
 
-    if(checkResults(y_serial, y_hll, rows) == 0){
+    if(check_results(y_serial, y_hll, rows) == 0){
         printf("Serial result is different from parallel result with hll\n");
         exit(1);
     }
 
     printf("HLL results checked\n");
 
-    calculatePerformanceOpenMP(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
 
-    calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s , omp_get_max_threads());
+    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s , omp_get_max_threads());
 
     free(time_serial);
     free(time_csr);
     free(time_hll);
     free(y_serial);
     free(y_hll);
-    freeHLLMatrix(hll);
+    free_hll_matrix(hll);
     free(x);
     free(mat->matrix);
     free(mat);
@@ -156,7 +156,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
     int nz = mat->nz;
 
     //Creazione vettore x
-    double *x = generateVector(matrix_name, cols);
+    double *x = generate_vector(matrix_name, cols);
 
     //Variabili per misura delle prestazioni
     double start_time, end_time = 0.0;
@@ -184,12 +184,12 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
         exit(EXIT_FAILURE);
     }
 
-    qsort(mat->matrix, nz, sizeof(COOElement), compareCOO);
+    qsort(mat->matrix, nz, sizeof(COOElement), compare_coo);
 
     //Creazione struct formato CSR
-    CSRMatrix *csr = convertCOOtoCSR(mat->matrix, nz, rows);
+    CSRMatrix *csr = convert_coo_to_csr(mat->matrix, nz, rows);
     // Creazione struct formato HLL
-    HLLMatrix *hll = convertCOOtoHLL(mat, HACKSIZE);
+    HLLMatrix *hll = convert_coo_to_hll(mat, HACKSIZE);
 
     //Allocazione risultato seriale
     double *y_serial = calloc(rows, sizeof(double)); 
@@ -215,7 +215,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
     //Calcolo seriale e misura dei tempi
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prodSerial(rows, csr, x, y_serial);   
+        prod_serial(rows, csr, x, y_serial);
         end_time = omp_get_wtime();
         double elapsed_time = end_time - start_time;
         times[i] = elapsed_time;
@@ -223,7 +223,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
 
     // printResult(y_serial, rows);
 
-    calculatePerformanceOpenMP(times, mat, matrix_name, "serial", 1, time_serial, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "serial", 1, time_serial, filename_p);
     
     memset(times, 0, sizeof(times));
     start_time = end_time = 0.0;
@@ -244,20 +244,20 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
         //Calcolo parallelo openmp CSR e misura dei tempi
         for (i = 0; i < REPETITIONS; i++) {
             start_time = omp_get_wtime();
-            prodOpenmpCSR(rows, csr, x, y_csr, row_bounds);   
+            prod_openmp_csr(rows, csr, x, y_csr, row_bounds);
             end_time = omp_get_wtime();
             double elapsed_time = end_time - start_time;
             times[i] = elapsed_time;
         }
 
-        if(checkResults(y_serial, y_csr, rows) == 0){
+        if(check_results(y_serial, y_csr, rows) == 0){
             printf("Serial result is different from parallel result with csr\n");
             exit(1);
         }
 
         printf("CSR results checked\n");
 
-        calculatePerformanceOpenMP(times, mat, matrix_name, "CSR", omp_get_max_threads(), time_csr, filename_p);
+        calculate_performance_openmp(times, mat, matrix_name, "CSR", omp_get_max_threads(), time_csr, filename_p);
 
         memset(times, 0, sizeof(times));
         start_time = end_time = 0.0;
@@ -265,35 +265,35 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
         //Calcolo parallelo openmp HLL e misura dei tempi
         for (i = 0; i < REPETITIONS; i++) {
             start_time = omp_get_wtime();
-            prodOpenmpHLL(hll, x, y_hll);  
+            prod_openmp_hll(hll, x, y_hll);
             end_time = omp_get_wtime();
             double elapsed_time = end_time - start_time;
             times[i] = elapsed_time;
         }
 
-        if(checkResults(y_serial, y_hll, rows) == 0){
+        if(check_results(y_serial, y_hll, rows) == 0){
             printf("Serial result is different from parallel result with hll\n");
             exit(1);
         }
 
         printf("HLL results checked\n");
 
-        calculatePerformanceOpenMP(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
+        calculate_performance_openmp(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
 
-        calculateSpeedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, omp_get_max_threads());
+        calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, omp_get_max_threads());
         
         free(row_bounds);
     }
 
 
     free(y_csr);
-    freeCSRMatrix(csr);
+    free_csr_matrix(csr);
     free(time_serial);
     free(time_csr);
     free(time_hll);
     free(y_serial);
     free(y_hll);
-    freeHLLMatrix(hll);
+    free_hll_matrix(hll);
     free(x);
     free(mat->matrix);
     free(mat);

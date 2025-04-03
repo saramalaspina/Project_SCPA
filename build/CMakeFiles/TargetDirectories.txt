@@ -1,3 +1,0 @@
-/data/smalaspina/Project_SCPA/build/CMakeFiles/exec_cuda.dir
-/data/smalaspina/Project_SCPA/build/CMakeFiles/edit_cache.dir
-/data/smalaspina/Project_SCPA/build/CMakeFiles/rebuild_cache.dir

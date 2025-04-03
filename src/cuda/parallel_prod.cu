@@ -42,7 +42,7 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
     }     
 }
 
-void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
     int *IRP = csr->IRP;
     int *JA = csr->JA;
     double *AS = csr->AS;
@@ -121,7 +121,7 @@ void prodCudaCSR(int M, int N, CSRMatrix *csr, double *x, double *y, float *elap
 
 //HLL
 
-double computeAverageMaxnz(const HLLMatrix *hllHost) {
+double compute_average_max_nz(const HLLMatrix *hllHost) {
     int numBlocks = hllHost->numBlocks;
     double sum = 0.0;
     for (int b = 0; b < numBlocks; b++) {
@@ -194,7 +194,7 @@ __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *
 }
 
 
-void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
+void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
     int N = hllHost->blocks[0].N;
     double *d_x, *d_y;
     cudaMalloc((void**)&d_x, totalRows * sizeof(double));
@@ -236,7 +236,7 @@ void prodCudaHLL(const HLLMatrix *hllHost, const double *xHost, double *yHost, i
     cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
     cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
 
-    double avg_nz_row = computeAverageMaxnz(hllHost);
+    double avg_nz_row = compute_average_max_nz(hllHost);
 
     // Configurazione per il calcolo del tempo di esecuzione
     cudaEvent_t start, stop;
