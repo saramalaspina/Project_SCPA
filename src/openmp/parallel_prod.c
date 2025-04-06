@@ -26,11 +26,11 @@ void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bound
 
 void prod_openmp_hll(HLLMatrix *hll, double *x, double *y) {
 
-    /* Parallelizzazione sul ciclo esterno (sui blocchi) */
+    // Parallelizzazione sul ciclo esterno (sui blocchi)
     #pragma omp parallel for schedule(guided)
     for (int b = 0; b < hll->numBlocks; b++) {
         EllpackBlock *block = &hll->blocks[b];
-        /* Il blocco b inizia dalla riga globale base = b * hackSize */
+        // Il blocco b inizia dalla riga globale base = b * hackSize 
         int base = b * hll->hackSize;
         for (int i = 0; i < block->block_rows; i++) {
             int global_row = base + i;
