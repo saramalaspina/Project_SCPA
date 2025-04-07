@@ -5,11 +5,12 @@
 extern "C" {
 #endif
 
-// converter
+#define REPETITIONS 30
 
+// converter
 #define HACKSIZE 32
 
-// Definizione COO
+// COO Matrix
 typedef struct {
     int row, col;
     double value;
@@ -20,22 +21,22 @@ typedef struct {
     COOElement *matrix;
 } MatrixElement;
 
-/* Struttura per un blocco in formato ELLPACK */
+// HLL Matrix with Ellpack Block
 typedef struct {
-    int block_rows;   // Numero di righe del blocco (<= hackSize)
-    int N;            // Numero di colonne della matrice (uguale per tutte)
-    int maxnz;        // Massimo numero di non-zeri in una riga di questo blocco
-    int *JA;          // Array 1D (di dimensione block_rows*maxnz) degli indici di colonna
-    double *AS;       // Array 1D (di dimensione block_rows*maxnz) dei valori non-zero
+    int block_rows;   
+    int N;           
+    int maxnz;   
+    int *JA;       
+    double *AS;  
 } EllpackBlock;
 
-/* Struttura per la matrice in formato HLL */
 typedef struct {
-    int hackSize;        // Parametro HackSize (es. 32)
-    int numBlocks;       // Numero di blocchi (M_totale/hackSize, ultimo blocco eventualmente ridotto)
-    EllpackBlock *blocks;// Array di blocchi in formato ELLPACK
+    int hackSize;     
+    int numBlocks;  
+    EllpackBlock *blocks;
 } HLLMatrix;
 
+// CSR Matrix
 typedef struct {
     int *IRP;
     int *JA;
@@ -45,40 +46,36 @@ typedef struct {
 CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m);
 HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize);
 
+//performance
+void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
+void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
+
 //utils 
 double *generate_vector(const char *matrix_name, int N);
 void free_hll_matrix(HLLMatrix *hll);
 void free_csr_matrix(CSRMatrix *csr);
 void print_result(double *y, int M);
-void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
-void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
 int check_results(double *y_serial, double *y_parallel, int size);
-void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
 int compare_coo(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
 
-// reader
-
+//reader
 MatrixElement* read_matrix(char* filename);
 
-// serial product
-
+//serial product
 void prod_serial(int M, CSRMatrix *csr, double *x, double *y);
 
-// parallel product openmp
-
+//parallel product openmp
 void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds);
 void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y);
 
-// parallel product cuda
-
+//parallel product cuda
 #define THREADS_PER_BLOCK 256
 #define WARP_SIZE 32
 
 void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
 void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
-
-#define REPETITIONS 30
 
 #ifdef __cplusplus
 }

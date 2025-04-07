@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_NZ_PER_ROW 256
-
 //CSR
 
 __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
@@ -121,16 +119,6 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
 
 //HLL
 
-double compute_average_max_nz(const HLLMatrix *hllHost) {
-    int numBlocks = hllHost->numBlocks;
-    double sum = 0.0;
-    for (int b = 0; b < numBlocks; b++) {
-        sum += hllHost->blocks[b].maxnz;
-    }
-    return (numBlocks > 0) ? (sum / numBlocks) : 0.0;
-}
-
-
 /* Kernel CUDA per il prodotto matrice-vettore.
    Ogni thread elabora una riga globale: calcola a quale blocco appartiene e l'indice locale,
    quindi accumula il prodotto per tutti i non-zeri in quella riga. */
@@ -240,8 +228,6 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     HLLMatrix *d_hll;
     cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
     cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
-
-    double avg_nz_row = compute_average_max_nz(hllHost);
 
     // Configurazione per il calcolo del tempo di esecuzione
     cudaEvent_t start, stop;
