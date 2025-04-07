@@ -78,7 +78,7 @@ void prod_openmp_hll(HLLMatrix *hll, double *x, double *y);
 void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
 void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
 
-#define REPETITIONS 10
+#define REPETITIONS 30
 
 #ifdef __cplusplus
 }

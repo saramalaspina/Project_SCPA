@@ -69,11 +69,11 @@ int file_is_empty(FILE *fp) {
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
     double total_time = 0.0;
 
-    for (int i = 1; i < REPETITIONS; i++){
+    for (int i = 10; i < REPETITIONS; i++){
         total_time += times[i];
     }
 
-    total_time /= (REPETITIONS - 1); 
+    total_time /= (REPETITIONS - 10); 
     double time_ms = total_time * 1000;
 
     double flops = (2.0 * mat->nz) / total_time;
@@ -128,11 +128,11 @@ void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds)
 void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
     double total_time = 0.0;
 
-    for (int i = 1; i < REPETITIONS; i++){
+    for (int i = 10; i < REPETITIONS; i++){
         total_time += times[i];
     }
 
-    total_time /= (REPETITIONS - 1); 
+    total_time /= (REPETITIONS - 10); 
 
     double flops = (2.0 * mat->nz) / (total_time/1000);
     double gflops = flops / 1e9;
