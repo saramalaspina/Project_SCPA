@@ -1,0 +1,1 @@
+/opt/cuda/12.6/bin/nvcc -forward-unknown-to-host-compiler  --generate-code=arch=compute_75,code=[compute_75,sm_75] -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink --options-file CMakeFiles/exec_cuda.dir/deviceObjects1.rsp -o CMakeFiles/exec_cuda.dir/cmake_device_link.o --options-file CMakeFiles/exec_cuda.dir/deviceLinkLibs.rsp

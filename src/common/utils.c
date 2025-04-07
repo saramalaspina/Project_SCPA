@@ -180,7 +180,7 @@ int check_results(double *y_serial, double *y_parallel, int size) {
 
 
 
-void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads){
+void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz){
 
     double speedup_csr = time_serial/time_csr;
     double speedup_hll = time_serial/time_hll;
@@ -196,14 +196,14 @@ void calculate_speedup(const char* matrix_name, double time_serial, double time_
 
     if(numThreads != 0){
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, time_serial, speedup_csr, speedup_hll, nThreads\n");
+            fprintf(fp, "matrix, nz, time_serial, speedup_csr, speedup_hll, nThreads\n");
         }
-        fprintf(fp, "%s, %.6f, %.6f, %.6f, %d\n", matrix_name, time_serial, speedup_csr, speedup_hll, numThreads);
+        fprintf(fp, "%s, %d, %.6f, %.6f, %.6f, %d\n", matrix_name, nz, time_serial, speedup_csr, speedup_hll, numThreads);
     } else {
         if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, time_serial, speedup_csr, speedup_hll\n");
+            fprintf(fp, "matrix, nz, time_serial, speedup_csr, speedup_hll\n");
         }
-        fprintf(fp, "%s, %.6f, %.6f, %.6f\n", matrix_name, time_serial, speedup_csr, speedup_hll);
+        fprintf(fp, "%s, %d, %.6f, %.6f, %.6f\n", matrix_name, nz, time_serial, speedup_csr, speedup_hll);
     }
    
     fclose(fp);    

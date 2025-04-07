@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 
     calculate_performance_cuda(times, mat, matrix_name, "HLL", time_hll);
 
-    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/cuda/speedup.csv", 0);
+    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/cuda/speedup.csv", 0, nz);
 
     free(times);
     free(time_serial);

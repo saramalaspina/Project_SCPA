@@ -135,7 +135,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
 
     calculate_performance_openmp(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
 
-    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s , omp_get_max_threads());
+    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s , omp_get_max_threads(), nz);
 
     free(time_serial);
     free(time_csr);
@@ -280,7 +280,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat){
 
         calculate_performance_openmp(times, mat, matrix_name, "HLL", omp_get_max_threads(), time_hll, filename_p);
 
-        calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, omp_get_max_threads());
+        calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, omp_get_max_threads(), nz);
         
         free(row_bounds);
     }
