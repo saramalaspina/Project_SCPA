@@ -16,21 +16,9 @@ void free_hll_matrix(HLLMatrix *hll) {
     free(hll);
 }
 
-// Calcola un hash (che fungerà poi da seed) in base al nome della matrice considerata.
-unsigned int hash_string(const char *str) {
-    unsigned int hash = 5381;
-    int c;
-
-    while ((c = *str++))
-        hash = ((hash << 5) + hash) + c; // hash * 33 + ASCII carattere corrente
-
-    return hash;
-}
-
 double *generate_vector(const char *matrix_name, int N) {
-    unsigned int seed = hash_string(matrix_name);
     // Imposta il seed per la riproducibilità
-    srand(seed);
+    srand(1234);
 
     // Allocazione dinamica del vettore x
     double *x = (double *)malloc(N * sizeof(double));
