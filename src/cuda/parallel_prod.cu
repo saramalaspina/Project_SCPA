@@ -134,64 +134,69 @@ double compute_average_max_nz(const HLLMatrix *hllHost) {
 /* Kernel CUDA per il prodotto matrice-vettore.
    Ogni thread elabora una riga globale: calcola a quale blocco appartiene e l'indice locale,
    quindi accumula il prodotto per tutti i non-zeri in quella riga. */
-__global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
+   __global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
     int globalRow = blockIdx.x * blockDim.x + threadIdx.x;
     if (globalRow >= totalRows) return;
 
-    // Determina il blocco e la riga locale in base a hackSize
     int b = globalRow / hackSize;
     int localRow = globalRow % hackSize;
+
     if (localRow >= d_blocks[b].block_rows)
-        return; // nel caso dell'ultimo blocco che contiene meno righe
+        return;
 
     double sum = 0.0;
     int maxnz = d_blocks[b].maxnz;
-    int rowStart = localRow * maxnz;
+    int blockRows = d_blocks[b].block_rows;
+
     for (int j = 0; j < maxnz; j++) {
-        int col = d_blocks[b].JA[rowStart + j];
-        if (col != -1) {  // -1 indica una cella vuota
-            sum += d_blocks[b].AS[rowStart + j] * d_x[col];
+        int index = j * blockRows + localRow;  // column-major access
+        int col = d_blocks[b].JA[index];
+        if (col != -1) {
+            sum += d_blocks[b].AS[index] * d_x[col];
         }
     }
     d_y[globalRow] = sum;
 }
 
+
 // Kernel ottimizzato con warp-level parallelism
 __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
-    // Ogni warp elabora una riga globale
-    int warpId = (blockIdx.x * blockDim.x + threadIdx.x) / warpSize; // indice della riga globale
-    int lane   = threadIdx.x % warpSize;  // indice del thread all'interno del warp
+    int threadId = blockIdx.x * blockDim.x + threadIdx.x;
+    int warpId = threadId / warpSize;       // Ogni warp lavora su una riga
+    int lane   = threadIdx.x % warpSize;    // Indice del thread nel warp
 
     if (warpId >= totalRows) return;
 
-    // Determina il blocco e la riga locale nel blocco HLL
     int b = warpId / hackSize;
     int localRow = warpId % hackSize;
+
     if (localRow >= d_blocks[b].block_rows)
-        return;  // gestione del caso in cui l'ultimo blocco abbia meno righe
+        return;
 
     int maxnz = d_blocks[b].maxnz;
-    int rowStart = localRow * maxnz;
+    int blockRows = d_blocks[b].block_rows;
 
-    // Ogni lane elabora una parte degli elementi della riga:
     double sum = 0.0;
+
+    // Ogni lane elabora parte delle colonne
     for (int j = lane; j < maxnz; j += warpSize) {
-        int col = d_blocks[b].JA[rowStart + j];
-        if (col != -1) {  // -1 indica una cella vuota
-            sum += d_blocks[b].AS[rowStart + j] * d_x[col];
+        int index = j * blockRows + localRow;  // column-major access
+        int col = d_blocks[b].JA[index];
+        if (col != -1) {
+            sum += d_blocks[b].AS[index] * d_x[col];
         }
     }
 
-    // Riduzione warp-level usando __shfl_down_sync per sommare le parziali
+    // Riduzione warp-level con shuffle
     for (int offset = warpSize / 2; offset > 0; offset /= 2) {
-        sum += __shfl_down_sync(0xffffffff, sum, offset);
+        sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
     }
 
-    // Il thread lane 0 del warp scrive il risultato della riga
     if (lane == 0) {
         d_y[warpId] = sum;
     }
 }
+
 
 
 void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
@@ -242,48 +247,25 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    
-    if(avg_nz_row < 16) {
-        // Lancio del kernel: un thread per riga globale
-        int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
-        cudaEventRecord(start, 0);
+    // Lancio del kernel: un thread per riga globale
+    int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
-        spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+    cudaEventRecord(start, 0);
 
-        // Controlla errori di lancio kernel
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess) {
-            fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
-            exit(EXIT_FAILURE);
-        }
+    spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-     
-        cudaEventElapsedTime(elapsed_time, start, stop);
-
-    } else {
-        // Lancio del kernel: un warp per riga globale
-        int warpsPerBlock = THREADS_PER_BLOCK / WARP_SIZE; // 
-        int totalWarps = (totalRows + warpsPerBlock - 1) / warpsPerBlock;
-
-        cudaEventRecord(start, 0);
-
-        spmv_hll_kernel_warp<<<totalWarps, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
-
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess) {
-            fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
-            exit(EXIT_FAILURE);
-        }
-
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-    
-        cudaEventElapsedTime(elapsed_time, start, stop);
-
+    // Controlla errori di lancio kernel
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
     }
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+        
+    cudaEventElapsedTime(elapsed_time, start, stop);
 
     // Copia del vettore risultato y da device a host
     cudaMemcpy(yHost, d_y, totalRows * sizeof(double), cudaMemcpyDeviceToHost);

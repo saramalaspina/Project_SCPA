@@ -67,8 +67,8 @@ void prod_serial(int M, CSRMatrix *csr, double *x, double *y);
 
 // parallel product openmp
 
-void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds);
-void prod_openmp_hll(HLLMatrix *hll, double *x, double *y);
+void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds);
+void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y);
 
 // parallel product cuda
 

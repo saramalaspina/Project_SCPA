@@ -1,7 +1,7 @@
-CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o: \
- /data/sperelli/Project_SCPA/src/common/serial_prod.c \
+CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o: \
+ /data/smalaspina/Project_SCPA/src/common/serial_prod.c \
  /usr/include/stdc-predef.h \
- /data/sperelli/Project_SCPA/src/common/../../lib/utils.h \
+ /data/smalaspina/Project_SCPA/src/common/../../lib/utils.h \
  /usr/include/stdio.h /usr/include/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/bits/wordsize.h /usr/include/bits/timesize.h \

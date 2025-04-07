@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <omp.h>
 
-void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bounds) {
+void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds) {
     int num_threads = omp_get_max_threads();
 
     #pragma omp parallel num_threads(num_threads)
@@ -24,20 +24,23 @@ void prod_openmp_csr(int M, CSRMatrix *csr, double *x, double *y, int *row_bound
 }
 
 
-void prod_openmp_hll(HLLMatrix *hll, double *x, double *y) {
-
+void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y) {
     // Parallelizzazione sul ciclo esterno (sui blocchi)
     #pragma omp parallel for schedule(guided)
     for (int b = 0; b < hll->numBlocks; b++) {
         EllpackBlock *block = &hll->blocks[b];
-        // Il blocco b inizia dalla riga globale base = b * hackSize 
         int base = b * hll->hackSize;
+        
+        // Ciclo sulle righe del blocco
         for (int i = 0; i < block->block_rows; i++) {
             int global_row = base + i;
             double sum = 0.0;
+            
+            // Ciclo sugli elementi non-zeri della riga
             for (int j = 0; j < block->maxnz; j++) {
-                int idx = i * block->maxnz + j;
+                int idx = j * block->block_rows + i;  // Accesso column-major
                 int col = block->JA[idx];
+                
                 if (col != -1) {  // controllo che l'elemento sia valido
                     sum += block->AS[idx] * x[col];
                 }
@@ -46,6 +49,7 @@ void prod_openmp_hll(HLLMatrix *hll, double *x, double *y) {
         }
     }
 }
+
 
     
 

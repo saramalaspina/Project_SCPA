@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /data/sperelli/Project_SCPA/src/cuda
+CMAKE_SOURCE_DIR = /data/smalaspina/Project_SCPA/src/cuda
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /data/sperelli/Project_SCPA/build
+CMAKE_BINARY_DIR = /data/smalaspina/Project_SCPA/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /data/sperelli/Project_SCPA/build/CMakeFiles /data/sperelli/Project_SCPA/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /data/smalaspina/Project_SCPA/build/CMakeFiles /data/smalaspina/Project_SCPA/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /data/sperelli/Project_SCPA/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /data/smalaspina/Project_SCPA/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,125 +129,125 @@ exec_cuda/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/build
 .PHONY : exec_cuda/fast
 
-data/sperelli/Project_SCPA/src/common/converter.o: data/sperelli/Project_SCPA/src/common/converter.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.o
+data/smalaspina/Project_SCPA/src/common/converter.o: data/smalaspina/Project_SCPA/src/common/converter.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.o
 
 # target to build an object file
-data/sperelli/Project_SCPA/src/common/converter.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.c.o
+data/smalaspina/Project_SCPA/src/common/converter.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.c.o
 
-data/sperelli/Project_SCPA/src/common/converter.i: data/sperelli/Project_SCPA/src/common/converter.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.i
+data/smalaspina/Project_SCPA/src/common/converter.i: data/smalaspina/Project_SCPA/src/common/converter.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.i
 
 # target to preprocess a source file
-data/sperelli/Project_SCPA/src/common/converter.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.c.i
+data/smalaspina/Project_SCPA/src/common/converter.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.c.i
 
-data/sperelli/Project_SCPA/src/common/converter.s: data/sperelli/Project_SCPA/src/common/converter.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.s
+data/smalaspina/Project_SCPA/src/common/converter.s: data/smalaspina/Project_SCPA/src/common/converter.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.s
 
 # target to generate assembly for a file
-data/sperelli/Project_SCPA/src/common/converter.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/converter.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/converter.c.s
+data/smalaspina/Project_SCPA/src/common/converter.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/converter.c.s
 
-data/sperelli/Project_SCPA/src/common/mmio.o: data/sperelli/Project_SCPA/src/common/mmio.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.o
+data/smalaspina/Project_SCPA/src/common/mmio.o: data/smalaspina/Project_SCPA/src/common/mmio.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.o
 
 # target to build an object file
-data/sperelli/Project_SCPA/src/common/mmio.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.c.o
+data/smalaspina/Project_SCPA/src/common/mmio.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.c.o
 
-data/sperelli/Project_SCPA/src/common/mmio.i: data/sperelli/Project_SCPA/src/common/mmio.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.i
+data/smalaspina/Project_SCPA/src/common/mmio.i: data/smalaspina/Project_SCPA/src/common/mmio.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.i
 
 # target to preprocess a source file
-data/sperelli/Project_SCPA/src/common/mmio.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.c.i
+data/smalaspina/Project_SCPA/src/common/mmio.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.c.i
 
-data/sperelli/Project_SCPA/src/common/mmio.s: data/sperelli/Project_SCPA/src/common/mmio.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.s
+data/smalaspina/Project_SCPA/src/common/mmio.s: data/smalaspina/Project_SCPA/src/common/mmio.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.s
 
 # target to generate assembly for a file
-data/sperelli/Project_SCPA/src/common/mmio.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/mmio.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/mmio.c.s
+data/smalaspina/Project_SCPA/src/common/mmio.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/mmio.c.s
 
-data/sperelli/Project_SCPA/src/common/reader.o: data/sperelli/Project_SCPA/src/common/reader.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.o
+data/smalaspina/Project_SCPA/src/common/reader.o: data/smalaspina/Project_SCPA/src/common/reader.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.o
 
 # target to build an object file
-data/sperelli/Project_SCPA/src/common/reader.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.c.o
+data/smalaspina/Project_SCPA/src/common/reader.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.c.o
 
-data/sperelli/Project_SCPA/src/common/reader.i: data/sperelli/Project_SCPA/src/common/reader.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.i
+data/smalaspina/Project_SCPA/src/common/reader.i: data/smalaspina/Project_SCPA/src/common/reader.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.i
 
 # target to preprocess a source file
-data/sperelli/Project_SCPA/src/common/reader.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.c.i
+data/smalaspina/Project_SCPA/src/common/reader.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.c.i
 
-data/sperelli/Project_SCPA/src/common/reader.s: data/sperelli/Project_SCPA/src/common/reader.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.s
+data/smalaspina/Project_SCPA/src/common/reader.s: data/smalaspina/Project_SCPA/src/common/reader.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.s
 
 # target to generate assembly for a file
-data/sperelli/Project_SCPA/src/common/reader.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/reader.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/reader.c.s
+data/smalaspina/Project_SCPA/src/common/reader.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/reader.c.s
 
-data/sperelli/Project_SCPA/src/common/serial_prod.o: data/sperelli/Project_SCPA/src/common/serial_prod.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.o
+data/smalaspina/Project_SCPA/src/common/serial_prod.o: data/smalaspina/Project_SCPA/src/common/serial_prod.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.o
 
 # target to build an object file
-data/sperelli/Project_SCPA/src/common/serial_prod.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.c.o
+data/smalaspina/Project_SCPA/src/common/serial_prod.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.c.o
 
-data/sperelli/Project_SCPA/src/common/serial_prod.i: data/sperelli/Project_SCPA/src/common/serial_prod.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.i
+data/smalaspina/Project_SCPA/src/common/serial_prod.i: data/smalaspina/Project_SCPA/src/common/serial_prod.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.i
 
 # target to preprocess a source file
-data/sperelli/Project_SCPA/src/common/serial_prod.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.c.i
+data/smalaspina/Project_SCPA/src/common/serial_prod.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.c.i
 
-data/sperelli/Project_SCPA/src/common/serial_prod.s: data/sperelli/Project_SCPA/src/common/serial_prod.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.s
+data/smalaspina/Project_SCPA/src/common/serial_prod.s: data/smalaspina/Project_SCPA/src/common/serial_prod.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.s
 
 # target to generate assembly for a file
-data/sperelli/Project_SCPA/src/common/serial_prod.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/serial_prod.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/serial_prod.c.s
+data/smalaspina/Project_SCPA/src/common/serial_prod.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/serial_prod.c.s
 
-data/sperelli/Project_SCPA/src/common/utils.o: data/sperelli/Project_SCPA/src/common/utils.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.o
+data/smalaspina/Project_SCPA/src/common/utils.o: data/smalaspina/Project_SCPA/src/common/utils.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.o
 
 # target to build an object file
-data/sperelli/Project_SCPA/src/common/utils.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.o
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.c.o
+data/smalaspina/Project_SCPA/src/common/utils.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.c.o
 
-data/sperelli/Project_SCPA/src/common/utils.i: data/sperelli/Project_SCPA/src/common/utils.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.i
+data/smalaspina/Project_SCPA/src/common/utils.i: data/smalaspina/Project_SCPA/src/common/utils.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.i
 
 # target to preprocess a source file
-data/sperelli/Project_SCPA/src/common/utils.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.i
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.c.i
+data/smalaspina/Project_SCPA/src/common/utils.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.c.i
 
-data/sperelli/Project_SCPA/src/common/utils.s: data/sperelli/Project_SCPA/src/common/utils.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.s
+data/smalaspina/Project_SCPA/src/common/utils.s: data/smalaspina/Project_SCPA/src/common/utils.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.s
 
 # target to generate assembly for a file
-data/sperelli/Project_SCPA/src/common/utils.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/sperelli/Project_SCPA/src/common/utils.c.s
-.PHONY : data/sperelli/Project_SCPA/src/common/utils.c.s
+data/smalaspina/Project_SCPA/src/common/utils.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/utils.c.s
 
 main.o: main.cu.o
 .PHONY : main.o
@@ -306,21 +306,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... exec_cuda"
-	@echo "... data/sperelli/Project_SCPA/src/common/converter.o"
-	@echo "... data/sperelli/Project_SCPA/src/common/converter.i"
-	@echo "... data/sperelli/Project_SCPA/src/common/converter.s"
-	@echo "... data/sperelli/Project_SCPA/src/common/mmio.o"
-	@echo "... data/sperelli/Project_SCPA/src/common/mmio.i"
-	@echo "... data/sperelli/Project_SCPA/src/common/mmio.s"
-	@echo "... data/sperelli/Project_SCPA/src/common/reader.o"
-	@echo "... data/sperelli/Project_SCPA/src/common/reader.i"
-	@echo "... data/sperelli/Project_SCPA/src/common/reader.s"
-	@echo "... data/sperelli/Project_SCPA/src/common/serial_prod.o"
-	@echo "... data/sperelli/Project_SCPA/src/common/serial_prod.i"
-	@echo "... data/sperelli/Project_SCPA/src/common/serial_prod.s"
-	@echo "... data/sperelli/Project_SCPA/src/common/utils.o"
-	@echo "... data/sperelli/Project_SCPA/src/common/utils.i"
-	@echo "... data/sperelli/Project_SCPA/src/common/utils.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/converter.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/converter.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/converter.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/reader.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/reader.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/reader.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/serial_prod.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/serial_prod.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/serial_prod.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/utils.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/utils.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/utils.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
