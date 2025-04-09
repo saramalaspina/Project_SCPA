@@ -7,10 +7,10 @@ extern "C" {
 
 #define REPETITIONS 30
 
-// converter
+//converter
 #define HACKSIZE 32
 
-// COO Matrix
+//COO Matrix
 typedef struct {
     int row, col;
     double value;
@@ -21,7 +21,7 @@ typedef struct {
     COOElement *matrix;
 } MatrixElement;
 
-// HLL Matrix with Ellpack Block
+//HLL Matrix with Ellpack Block
 typedef struct {
     int block_rows;   
     int N;           
@@ -36,7 +36,7 @@ typedef struct {
     EllpackBlock *blocks;
 } HLLMatrix;
 
-// CSR Matrix
+//CSR Matrix
 typedef struct {
     int *IRP;
     int *JA;

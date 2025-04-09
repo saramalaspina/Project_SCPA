@@ -6,6 +6,7 @@
 CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m) {
     printf("Converting COO to CSR...\n");
     
+    // Allocate the CSR matrix structure
     CSRMatrix *matrix = (CSRMatrix *) malloc(sizeof(CSRMatrix));
     if (!matrix) {
         fprintf(stderr, "Errore di allocazione per CSRMatrix\n");
@@ -16,35 +17,35 @@ CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m) {
     matrix->JA = (int *)malloc(nz * sizeof(int));
     matrix->AS = (double *)malloc(nz * sizeof(double));
 
-    // Inizializzazione degli array CSR
+    // Initialize array
     for (int i = 0; i <= m; i++) {
         matrix->IRP[i] = 0;
     }
 
-    // Costruzione di row_ptr (conteggio elementi per riga)
+    // Count number of elements per row
     for (int i = 0; i < nz; i++) {
         matrix->IRP[coo[i].row + 1]++;
     }
 
-    // Conversione dei conteggi in indici cumulativi
+    // Conversion into cumulative indexes
     for (int i = 1; i <= m; i++) {
         matrix->IRP[i] += matrix->IRP[i - 1];
     }
 
-    // Array temporaneo per tracciare le posizioni di inserimento
+    // Temporary array to track insertion locations
     int *row_counter = (int *)malloc(m * sizeof(int));
     memcpy(row_counter, matrix->IRP, m * sizeof(int));
 
-    // Riempie JA e AS rispettando l'ordine corretto delle righe
+    // Fill JA and AS 
     for (int i = 0; i < nz; i++) {
         int row = coo[i].row;
-        int index = row_counter[row];  // Posizione corretta
+        int index = row_counter[row]; 
         matrix->JA[index] = coo[i].col;
         matrix->AS[index] = coo[i].value;
-        row_counter[row]++;  // Avanza la posizione per la prossima scrittura
+        row_counter[row]++;  
     }
 
-    free(row_counter);  // Rilascia la memoria allocata
+    free(row_counter);  
 
     return matrix;
 
@@ -54,28 +55,34 @@ CSRMatrix *convert_coo_to_csr(COOElement *coo, int nz, int m) {
 HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize) {
     printf("Converting COO to HLL...\n");
 
+    // Validate input
     if (!coo || coo->nz < 0 || hackSize <= 0)
         return NULL;
-    
+
+    // Calculate number of blocks based on hackSize
     int numBlocks = (coo->M + hackSize - 1) / hackSize;
 
+    // Allocate the HLL matrix structure
     HLLMatrix *hll = (HLLMatrix *) malloc(sizeof(HLLMatrix));
     if (!hll) {
-        fprintf(stderr, "Errore di allocazione per HLLMatrix\n");
+        fprintf(stderr, "Memory allocation failed for HLLMatrix\n");
         exit(EXIT_FAILURE);
     }
 
     hll->hackSize = hackSize;
     hll->numBlocks = numBlocks;
+
+    // Allocate memory for the ELLPACK blocks
     hll->blocks = (EllpackBlock *) malloc(numBlocks * sizeof(EllpackBlock));
     if (!hll->blocks) {
-        fprintf(stderr, "Errore di allocazione per i blocchi ELLPACK\n");
+        fprintf(stderr, "Memory allocation failed for ELLPACK blocks\n");
         free(hll);
         exit(EXIT_FAILURE);
     }
 
-    int coo_index = 0;
+    int coo_index = 0;  // index to iterate through COO matrix elements
 
+    // Process each block
     for (int b = 0; b < numBlocks; b++) {
         int startRow = b * hackSize;
         int endRow = (b + 1) * hackSize;
@@ -83,15 +90,17 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize) {
             endRow = coo->M;
         int blockRows = endRow - startRow;
 
-        // Calcola maxnz per il blocco
+        // Track non-zeros per row to determine the block max width
         int *nnz_per_row = (int *) calloc(blockRows, sizeof(int));
         if (!nnz_per_row) {
-            fprintf(stderr, "Errore di allocazione per nnz_per_row\n");
+            fprintf(stderr, "Memory allocation failed for nnz_per_row\n");
             exit(EXIT_FAILURE);
         }
 
         int block_maxnz = 0;
         int temp_index = coo_index;
+
+        // Count non-zeros for each row in the block
         for (int i = 0; i < blockRows; i++) {
             int currentRow = startRow + i;
             int count = 0;
@@ -104,29 +113,31 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize) {
                 block_maxnz = count;
         }
 
-        // Alloca array in column-major layout
+        // Allocate ELLPACK arrays for this block (column-major format)
         int *JA = (int *) malloc(blockRows * block_maxnz * sizeof(int));
         double *AS = (double *) malloc(blockRows * block_maxnz * sizeof(double));
         if (!JA || !AS) {
-            fprintf(stderr, "Errore di allocazione per gli array del blocco\n");
+            fprintf(stderr, "Memory allocation failed for block arrays\n");
             exit(EXIT_FAILURE);
         }
 
+        // Initialize arrays
         for (int i = 0; i < blockRows * block_maxnz; i++) {
             JA[i] = -1;
             AS[i] = 0.0;
         }
 
-        // Riempimento in column-major layout
+        // Fill JA and AS arrays with COO data
         for (int i = 0; i < blockRows; i++) {
             int currentRow = startRow + i;
             int count = 0;
             while (coo_index < coo->nz && coo->matrix[coo_index].row == currentRow) {
                 if (count >= block_maxnz) {
-                    fprintf(stderr, "Overflow: troppi elementi nella riga\n");
+                    fprintf(stderr, "Overflow: too many elements in row\n");
                     break;
                 }
-                int index = count * blockRows + i;  // <-- column-major
+                // Use column-major order: count * blockRows + i
+                int index = count * blockRows + i;
                 JA[index] = coo->matrix[coo_index].col;
                 AS[index] = coo->matrix[coo_index].value;
                 count++;
@@ -134,15 +145,15 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize) {
             }
         }
 
-        // Assegna al blocco
+        // Save the block's data
         hll->blocks[b].block_rows = blockRows;
         hll->blocks[b].N = coo->N;
         hll->blocks[b].maxnz = block_maxnz;
         hll->blocks[b].JA = JA;
         hll->blocks[b].AS = AS;
 
-        free(nnz_per_row);
+        free(nnz_per_row);  
     }
 
-    return hll;
+    return hll; 
 }

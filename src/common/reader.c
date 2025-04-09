@@ -3,30 +3,33 @@
 #include "../../lib/mmio.h"
 #include "../../lib/utils.h"
 
+// Reads a sparse matrix from a Matrix Market (.mtx) file
 MatrixElement* read_matrix(char *file_name) {
 
     int ret_code;
     MM_typecode matcode;
     FILE *f;
-    int M, N, nz;
+    int M, N, nz; 
     int i, *I, *J;
     double *val;
 
+    // Open the file for reading
     if ((f = fopen(file_name, "r")) == NULL) {
         printf("Error opening file %s\n", file_name);
         exit(1);
     }
 
+    // Read the Matrix Market header
     if (mm_read_banner(f, &matcode) != 0) {
         printf("Could not process Matrix Market banner.\n");
         exit(1);
     }
 
-    /* Trova le dimensioni della matrice sparsa */
+    // Read the size of the matrix and the number of non-zero elements
     if ((ret_code = mm_read_mtx_crd_size(f, &M, &N, &nz)) != 0)
         exit(1);
 
-    /* Allocazione degli array per la lettura */
+    // Allocate arrays for the COO format
     I = (int *) malloc(nz * sizeof(int));
     J = (int *) malloc(nz * sizeof(int));
     val = (double *) malloc(nz * sizeof(double));
@@ -35,11 +38,8 @@ MatrixElement* read_matrix(char *file_name) {
         exit(1);
     }
 
-    /* Lettura degli elementi dal file:
-       - Se la matrice è di tipo "pattern" vengono letti solo I e J,
-         e il valore viene impostato a 1.0.
-       - Altrimenti, viene letto anche il valore esplicito.
-    */
+    // Read the entries of the matrix
+    // If it's a "pattern" matrix, read only row and column indices, and set value to 1.0
     for (i = 0; i < nz; i++) {
         if (mm_is_pattern(matcode)) {
             if (fscanf(f, "%d %d\n", &I[i], &J[i]) != 2) {
@@ -53,16 +53,13 @@ MatrixElement* read_matrix(char *file_name) {
                 exit(1);
             }
         }
-        /* conversione da 1-based a 0-based */
+        // Convert from 1-based indexing to 0-based
         I[i]--;
         J[i]--;
     }
     fclose(f);
 
-    /* Gestione delle matrici simmetriche:
-       Se la matrice è simmetrica, per ogni elemento fuori diagonale,
-       aggiungiamo la sua controparte speculare.
-    */
+    // If the matrix is symmetric, add the symmetric counterpart for each off-diagonal element
     if (mm_is_symmetric(matcode)) {
         printf("Symmetric matrix\n");
         int additional = 0;
@@ -71,6 +68,8 @@ MatrixElement* read_matrix(char *file_name) {
                 additional++;
         }
         int nz_tot = nz + additional;
+
+        // Allocate new arrays to hold the symmetric matrix
         int *I_sym = (int *) malloc(nz_tot * sizeof(int));
         int *J_sym = (int *) malloc(nz_tot * sizeof(int));
         double *val_sym = (double *) malloc(nz_tot * sizeof(double));
@@ -78,14 +77,14 @@ MatrixElement* read_matrix(char *file_name) {
             printf("Memory allocation failed\n");
             exit(1);
         }
+
         int pos = 0;
         for (i = 0; i < nz; i++) {
-            /* Copia l'elemento originale */
             I_sym[pos] = I[i];
             J_sym[pos] = J[i];
             val_sym[pos] = val[i];
             pos++;
-            /* Se l'elemento è fuori diagonale, aggiungi anche la controparte */
+            // If it's off-diagonal, add the symmetric counterpart
             if (I[i] != J[i]) {
                 I_sym[pos] = J[i];
                 J_sym[pos] = I[i];
@@ -93,6 +92,7 @@ MatrixElement* read_matrix(char *file_name) {
                 pos++;
             }
         }
+
         nz = nz_tot;
         free(I);
         free(J);
@@ -102,29 +102,26 @@ MatrixElement* read_matrix(char *file_name) {
         val = val_sym;
     }
 
-   
-    /*mm_write_banner(stdout, matcode);
-    mm_write_mtx_crd_size(stdout, M, N, nz);
-    for (i = 0; i < nz; i++)
-        fprintf(stdout, "%d %d %20.19g\n", I[i], J[i], val[i]);*/
-
-    /* Trasferimento dei dati in una struttura COO (o altra struttura scelta) */
+    // Allocate the COO element structure 
     COOElement *coo = malloc(nz * sizeof(COOElement));
     if (coo == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
+
     for (i = 0; i < nz; i++) {
         coo[i].row = I[i];
         coo[i].col = J[i];
         coo[i].value = val[i];
     }
 
+    // Allocate the final matrix 
     MatrixElement *mat = malloc(sizeof(MatrixElement));
     if (mat == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
+
     mat->M = M;
     mat->N = N;
     mat->nz = nz;
