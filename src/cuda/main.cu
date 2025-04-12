@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     }
     
     // Generate input vector x
-    double *x = generate_vector(matrix_name, cols);
+    double *x = generate_vector(cols);
 
     // Performance measurement variables
     clock_t start_time, end_time;

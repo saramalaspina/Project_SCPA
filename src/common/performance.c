@@ -1,6 +1,16 @@
 #include "../../lib/utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
+#include <omp.h>
 #include <time.h>
+
+int file_is_empty(FILE *fp) {
+    fseek(fp, 0, SEEK_END);  
+    long size = ftell(fp);  
+    return size == 0;
+}
 
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
     double total_time = 0.0;

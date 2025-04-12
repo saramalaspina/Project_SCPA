@@ -177,6 +177,30 @@ data/smalaspina/Project_SCPA/src/common/mmio.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.s
 .PHONY : data/smalaspina/Project_SCPA/src/common/mmio.c.s
 
+data/smalaspina/Project_SCPA/src/common/performance.o: data/smalaspina/Project_SCPA/src/common/performance.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.o
+
+# target to build an object file
+data/smalaspina/Project_SCPA/src/common/performance.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/performance.c.o
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.c.o
+
+data/smalaspina/Project_SCPA/src/common/performance.i: data/smalaspina/Project_SCPA/src/common/performance.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.i
+
+# target to preprocess a source file
+data/smalaspina/Project_SCPA/src/common/performance.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/performance.c.i
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.c.i
+
+data/smalaspina/Project_SCPA/src/common/performance.s: data/smalaspina/Project_SCPA/src/common/performance.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.s
+
+# target to generate assembly for a file
+data/smalaspina/Project_SCPA/src/common/performance.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exec_cuda.dir/build.make CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/performance.c.s
+.PHONY : data/smalaspina/Project_SCPA/src/common/performance.c.s
+
 data/smalaspina/Project_SCPA/src/common/reader.o: data/smalaspina/Project_SCPA/src/common/reader.c.o
 .PHONY : data/smalaspina/Project_SCPA/src/common/reader.o
 
@@ -312,6 +336,9 @@ help:
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.o"
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.i"
 	@echo "... data/smalaspina/Project_SCPA/src/common/mmio.s"
+	@echo "... data/smalaspina/Project_SCPA/src/common/performance.o"
+	@echo "... data/smalaspina/Project_SCPA/src/common/performance.i"
+	@echo "... data/smalaspina/Project_SCPA/src/common/performance.s"
 	@echo "... data/smalaspina/Project_SCPA/src/common/reader.o"
 	@echo "... data/smalaspina/Project_SCPA/src/common/reader.i"
 	@echo "... data/smalaspina/Project_SCPA/src/common/reader.s"

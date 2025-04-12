@@ -38,8 +38,8 @@ def plot_type_speedup(data, type, title, save_path):
     plt.close()
 
 
-plot_type_speedup(df_few, "CSR", "OpenMP Speedup matrices with few nz (<1e6) ", "openmp/graphs/speedup_CSR_few_nz.png")
-plot_type_speedup(df_few, "HLL", "OpenMP Speedup matrices with few nz (<1e6)", "openmp/graphs/speedup_HLL_few_nz.png")
+plot_type_speedup(df_few, "CSR", "OpenMP Speedup matrices with few nz (<1e6) ", "openmp/graphs/speedup_csr_few_nz.png")
+plot_type_speedup(df_few, "HLL", "OpenMP Speedup matrices with few nz (<1e6)", "openmp/graphs/speedup_hll_few_nz.png")
 
-plot_type_speedup(df_many, "CSR", "OpenMP Speedup matrices with many nz (>=1e6)", "openmp/graphs/speedup_CSR_many_nz.png")
-plot_type_speedup(df_many, "HLL", "OpenMP Speedup matrices with many nz (>=1e6)", "openmp/graphs/speedup_HLL_many_nz.png")
+plot_type_speedup(df_many, "CSR", "OpenMP Speedup matrices with many nz (>=1e6)", "openmp/graphs/speedup_csr_many_nz.png")
+plot_type_speedup(df_many, "HLL", "OpenMP Speedup matrices with many nz (>=1e6)", "openmp/graphs/speedup_hll_many_nz.png")

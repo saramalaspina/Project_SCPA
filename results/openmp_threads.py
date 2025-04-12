@@ -35,8 +35,8 @@ def plot_type_performance(data, type, title, save_path):
     print(f"Plot saved to: {save_path}")
     plt.close()
 
-plot_type_performance(df_few, 'CSR', "OpenMP Gflops matrices with few nz (<1e6)", "openmp/graphs/few_nz_CSR.png")
-plot_type_performance(df_few, 'HLL', "OpenMP Gflops matrices with few nz (<1e6)", "openmp/graphs/few_nz_HLL.png")
+plot_type_performance(df_few, 'CSR', "OpenMP Gflops matrices with few nz (<1e6)", "openmp/graphs/csr_few_nz.png")
+plot_type_performance(df_few, 'HLL', "OpenMP Gflops matrices with few nz (<1e6)", "openmp/graphs/hll_few_nz.png")
 
-plot_type_performance(df_many, 'CSR', "OpenMP Gflops matrices with many nz (>=1e6)", "openmp/graphs/many_nz_CSR.png")
-plot_type_performance(df_many, 'HLL', "OpenMP Gflops matrices with many nz (>=1e6)", "openmp/graphs/many_nz_HLL.png")
+plot_type_performance(df_many, 'CSR', "OpenMP Gflops matrices with many nz (>=1e6)", "openmp/graphs/csr_many_nz.png")
+plot_type_performance(df_many, 'HLL', "OpenMP Gflops matrices with many nz (>=1e6)", "openmp/graphs/hll_many_nz.png")

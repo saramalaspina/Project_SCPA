@@ -17,7 +17,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     char *filename_s = "results/openmp/speedup.csv";
 
     // Generate input vector x
-    double *x = generate_vector(matrix_name, cols);
+    double *x = generate_vector(cols);
 
     // Performance measurement variables
     double start_time, end_time = 0.0;
@@ -152,7 +152,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat) {
     char *filename_s = "results/openmp/speedup_threads.csv";
 
     // Generate input vector x
-    double *x = generate_vector(matrix_name, cols);
+    double *x = generate_vector(cols);
 
     // Performance measurement variables
     double start_time, end_time = 0.0;

@@ -24,7 +24,7 @@ void free_csr_matrix(CSRMatrix *csr){
 }
 
 // Generates a random vector of length N with values between 0.1 and 2.0
-double *generate_vector(const char *matrix_name, int N) {
+double *generate_vector(int N) {
     srand(1234);  // Set seed for reproducibility
 
     double *x = (double *)malloc(N * sizeof(double));
@@ -44,12 +44,6 @@ void print_result(double *y, int M){
     for(int i = 0; i < M; i++){
         printf("%lf\n", y[i]);
     }
-}
-
-int file_is_empty(FILE *fp) {
-    fseek(fp, 0, SEEK_END);  
-    long size = ftell(fp);  
-    return size == 0;
 }
 
 // Performs a binary search on the IRP array to find the row containing a given target non-zero index

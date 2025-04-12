@@ -52,7 +52,7 @@ void calculate_performance_cuda(double *times, MatrixElement *mat, const char *m
 void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
 
 //utils 
-double *generate_vector(const char *matrix_name, int N);
+double *generate_vector(int N);
 void free_hll_matrix(HLLMatrix *hll);
 void free_csr_matrix(CSRMatrix *csr);
 void print_result(double *y, int M);

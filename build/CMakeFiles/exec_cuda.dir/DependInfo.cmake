@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/data/smalaspina/Project_SCPA/src/common/converter.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/converter.c.o.d"
   "/data/smalaspina/Project_SCPA/src/common/mmio.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/mmio.c.o.d"
+  "/data/smalaspina/Project_SCPA/src/common/performance.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/performance.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/performance.c.o.d"
   "/data/smalaspina/Project_SCPA/src/common/reader.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/reader.c.o.d"
   "/data/smalaspina/Project_SCPA/src/common/serial_prod.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/serial_prod.c.o.d"
   "/data/smalaspina/Project_SCPA/src/common/utils.c" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o" "gcc" "CMakeFiles/exec_cuda.dir/data/smalaspina/Project_SCPA/src/common/utils.c.o.d"

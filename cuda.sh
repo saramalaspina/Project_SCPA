@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Clear previous results
 > results/cuda/performance.csv
 > results/cuda/speedup.csv
 
-# Lista di path delle matrici
-MATRICI=(
+# List of matrix paths
+MATRICES=(
     "cage4.mtx"
     "mhda416.mtx"
     "mcfe.mtx"
@@ -41,14 +40,14 @@ MATRICI=(
 echo "Loading modules for CUDA..."
 module -s load gnu mpich cuda
 
-echo "Compiling and running CUDA version..."
+echo "Compiling and running CUDA..."
 make cuda
 if [ $? -ne 0 ]; then
     echo "Error during CUDA compilation"
     exit 1
 fi
 
-# Iterate over the matrix list
+# Iterate through the list of matrices
 for MATRIX_PATH in "${MATRICES[@]}"; do
     echo "Running CUDA for $MATRIX_PATH..."
     ./bin/cuda "../matrix/$MATRIX_PATH"
