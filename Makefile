@@ -14,23 +14,22 @@ bin:
 	mkdir -p bin
 
 openmp: bin $(COMMON_SRC) $(OPENMP_SRC) $(OPENMP_MAIN)
-	@echo "Compilazione versione OpenMP..."
+	@echo "Compiling OpenMP version..."
 	$(CC) $(CFLAGS) $(OPENMP_FLAGS) -o bin/openmp $(COMMON_SRC) $(OPENMP_SRC)
 
 # CUDA Compilation using CMake
 cuda: 
-	@echo "Pulizia della cartella build..."
+	@echo "Cleaning build directory..."
 	rm -rf $(BUILD_DIR)
-	@echo "Compilazione versione CUDA con CMake..."
+	@echo "Compiling CUDA version with CMake..."
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && cmake ../src/cuda && make || echo "Errore nella compilazione CUDA!"
-	cp $(BUILD_DIR)/exec_cuda bin/cuda || echo "Errore: eseguibile CUDA non trovato!"
-
+	cd $(BUILD_DIR) && cmake ../src/cuda && make || echo "Error during CUDA compilation!"
+	cp $(BUILD_DIR)/exec_cuda bin/cuda || echo "Error: CUDA executable not found!"
 
 clean:
-	@echo "Pulizia dei file compilati..."
+	@echo "Cleaning compiled files..."
 	rm -rf bin/openmp bin/cuda $(BUILD_DIR)
 
-
 .PHONY: all openmp cuda clean
+
 

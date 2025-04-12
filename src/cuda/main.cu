@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
     free(elapsed_time_csr);
     free_csr_matrix(csr);
 
-    // Convert matrix to HLL format
+    // Convert matrix from COO to HLL format
     HLLMatrix *hll = convert_coo_to_hll(mat, HACKSIZE);
 
     // Allocate output vector for CUDA HLL result

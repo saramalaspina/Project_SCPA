@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Clear previous results
 > results/cuda/performance.csv
 > results/cuda/speedup.csv
 
@@ -36,20 +37,21 @@ MATRICI=(
     "af_1_k101.mtx"
     "roadNet-PA.mtx"
 )
-echo "Caricamento moduli per CUDA..."
+
+echo "Loading modules for CUDA..."
 module -s load gnu mpich cuda
 
-echo "Compilazione ed esecuzione CUDA..."
+echo "Compiling and running CUDA version..."
 make cuda
 if [ $? -ne 0 ]; then
-    echo "Errore nella compilazione CUDA"
+    echo "Error during CUDA compilation"
     exit 1
 fi
 
-# Itera sulla lista delle matrici
-for MATRIX_PATH in "${MATRICI[@]}"; do
-    echo "Eseguendo CUDA per $MATRIX_PATH..."
+# Iterate over the matrix list
+for MATRIX_PATH in "${MATRICES[@]}"; do
+    echo "Running CUDA for $MATRIX_PATH..."
     ./bin/cuda "../matrix/$MATRIX_PATH"
 done
 
-echo "Esecuzione CUDA completata per tutte le matrici."
+echo "CUDA execution completed for all matrices."

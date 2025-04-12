@@ -1,11 +1,12 @@
 #!/bin/bash
-MODE=0  # esecuzione con una sola configurazione di threads
+MODE=0  # single execution for a specified number of threads
 
+# Clear previous results
 > results/openmp/performance.csv
 > results/openmp/speedup.csv
 
-# Lista di path delle matrici
-MATRICI=(
+# List of matrix paths
+MATRICES=(
     "cage4.mtx"
     "mhda416.mtx"
     "mcfe.mtx"
@@ -38,17 +39,17 @@ MATRICI=(
     "roadNet-PA.mtx"
 )
 
-echo "Compilazione ed esecuzione OpenMP..."
+echo "Compiling and running OpenMP version..."
 make openmp
 if [ $? -ne 0 ]; then
-    echo "Errore nella compilazione OpenMP"
+    echo "Error during OpenMP compilation"
     exit 1
 fi
 
-# Itera sulla lista delle matrici
-for MATRIX_PATH in "${MATRICI[@]}"; do
-    echo "Eseguendo OpenMP per $MATRIX_PATH..."
+# Iterate over the matrix list
+for MATRIX_PATH in "${MATRICES[@]}"; do
+    echo "Running OpenMP for $MATRIX_PATH..."
     ./bin/openmp "../matrix/$MATRIX_PATH" $MODE
 done
 
-echo "Esecuzione OpenMP completata per tutte le matrici."
+echo "OpenMP execution completed for all matrices."
