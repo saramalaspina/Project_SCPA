@@ -5,13 +5,16 @@
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename){
     double total_time = 0.0;
 
+    // Sum execution time in each repetition, excluding the first ten due to initial overhead factors
     for (int i = 10; i < REPETITIONS; i++){
         total_time += times[i];
     }
 
+    // Calculate average execution time (in seconds) 
     total_time /= (REPETITIONS - 10); 
     double time_ms = total_time * 1000;
 
+    // Calculate average flops and gigaflops
     double flops = (2.0 * mat->nz) / total_time;
     double gflops = flops / 1e9;
 
@@ -38,12 +41,16 @@ void calculate_performance_openmp(double *times, MatrixElement *mat, char *matri
 void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
     double total_time = 0.0;
 
+    // Sum execution time in each repetition, excluding the first ten due to initial overhead factors
+ 
     for (int i = 10; i < REPETITIONS; i++){
         total_time += times[i];
     }
 
+    // Calculate the average execution time (in milliseconds) 
     total_time /= (REPETITIONS - 10); 
 
+    // Calculate average flops and gigaflops
     double flops = (2.0 * mat->nz) / (total_time/1000);
     double gflops = flops / 1e9;
 
@@ -68,6 +75,7 @@ void calculate_performance_cuda(double *times, MatrixElement *mat, const char *m
 
 void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz){
 
+    // Calculate the speedup of parallel execution compared to serial execution
     double speedup_csr = time_serial/time_csr;
     double speedup_hll = time_serial/time_hll;
 

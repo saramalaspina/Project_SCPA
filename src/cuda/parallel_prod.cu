@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//CSR
+// ================= CSR =================
 
+// CUDA kernel for matrix-vector product in CSR format: one thread per row
 __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = blockIdx.x * blockDim.x + threadIdx.x;
     if (row < M) {
@@ -17,8 +18,7 @@ __global__ void spmv_csr_kernel(int M, int *IRP, int *JA, double *AS, double *x,
     }
 }
 
-//CSR con Warp 
-
+// CUDA kernel for matrix-vector product in CSR format with warp-level parallelism: one warp per row
 __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, double *x, double *y) {
     int row = (blockIdx.x * blockDim.x + threadIdx.x) / WARP_SIZE;
     int lane = threadIdx.x % WARP_SIZE;
@@ -40,6 +40,7 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
     }     
 }
 
+// Host function to compute the product using CUDA with CSR format
 void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
     int *IRP = csr->IRP;
     int *JA = csr->JA;
@@ -59,22 +60,23 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
     cudaMemcpy(d_AS, AS, IRP[M] * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
 
-    int nz = csr->IRP[M];  // numero totale di non zeri
-    double avg_nz_row = (double)nz / M; // numero medio di non zeri per riga
+    int nz = csr->IRP[M];
+    // Average number of non-zeros per row
+    double avg_nz_row = (double)nz / M; 
 
-    // Configurazione per il calcolo del tempo di esecuzione
+    // Configure timers to measure execution time
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
     if (avg_nz_row < 16) {
-        // Lancia il kernel classico thread-per-row
+        // Launch the thread-per-row kernel
         int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
         cudaEventRecord(start, 0);
 
         spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
 
-        // Controlla errori di lancio kernel
+        // Check for kernel launch errors
         cudaError_t err = cudaGetLastError();
         if (err != cudaSuccess) {
            fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
@@ -86,14 +88,14 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
         cudaEventElapsedTime(elapsed_time, start, stop);
 
     } else {
-        // Lancia il kernel warp-level: un warp per riga
+        // Launch warp-level kernel
         int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
         cudaEventRecord(start, 0);
 
         spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
         
-        // Controlla errori di lancio kernel
+        // Check for kernel launch errors
         cudaError_t err = cudaGetLastError();
         if (err != cudaSuccess) {
             fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
@@ -114,18 +116,16 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
     cudaFree(d_AS);
     cudaFree(d_x);
     cudaFree(d_y);
-
 }
 
-//HLL
+// ================= HLL =================
 
-/* Kernel CUDA per il prodotto matrice-vettore.
-   Ogni thread elabora una riga globale: calcola a quale blocco appartiene e l'indice locale,
-   quindi accumula il prodotto per tutti i non-zeri in quella riga. */
-   __global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
+/* CUDA kernel for matrix-vector product in HLL format: each thread processes a global row */
+__global__ void spmv_hll_kernel(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
     int globalRow = blockIdx.x * blockDim.x + threadIdx.x;
     if (globalRow >= totalRows) return;
 
+    // Determine which block the global row belongs to and the local row index within the block
     int b = globalRow / hackSize;
     int localRow = globalRow % hackSize;
 
@@ -136,9 +136,13 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
     int maxnz = d_blocks[b].maxnz;
     int blockRows = d_blocks[b].block_rows;
 
+    // Iterate over all the entries in the row of the block b
     for (int j = 0; j < maxnz; j++) {
-        int index = j * blockRows + localRow;  // column-major access
+        // Accessing in column-major format
+        int index = j * blockRows + localRow;
+        // Read the column index
         int col = d_blocks[b].JA[index];
+        // Check if the index is valid (not a padded entry)
         if (col != -1) {
             sum += d_blocks[b].AS[index] * d_x[col];
         }
@@ -146,12 +150,13 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
     d_y[globalRow] = sum;
 }
 
-
-// Kernel ottimizzato con warp-level parallelism
+// Optimized CUDA kernel with warp-level parallelism
 __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *d_blocks, const double *d_x, double *d_y) {
     int threadId = blockIdx.x * blockDim.x + threadIdx.x;
-    int warpId = threadId / warpSize;       // Ogni warp lavora su una riga
-    int lane   = threadIdx.x % warpSize;    // Indice del thread nel warp
+    // Each warp processes one row
+    int warpId = threadId / warpSize;  
+    // Lane index within the warp    
+    int lane   = threadIdx.x % warpSize;    
 
     if (warpId >= totalRows) return;
 
@@ -166,16 +171,16 @@ __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *
 
     double sum = 0.0;
 
-    // Ogni lane elabora parte delle colonne
+    // Each lane processes part of the columns
     for (int j = lane; j < maxnz; j += warpSize) {
-        int index = j * blockRows + localRow;  // column-major access
+        int index = j * blockRows + localRow; 
         int col = d_blocks[b].JA[index];
         if (col != -1) {
             sum += d_blocks[b].AS[index] * d_x[col];
         }
     }
 
-    // Riduzione warp-level con shuffle
+    // Warp-level reduction using shuffle
     for (int offset = warpSize / 2; offset > 0; offset /= 2) {
         sum += __shfl_down_sync(0xFFFFFFFF, sum, offset);
     }
@@ -185,20 +190,21 @@ __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *
     }
 }
 
-
-
+// Host function to compute matrix-vector product using CUDA and HLL format
 void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
     int N = hllHost->blocks[0].N;
+
+    // Allocate and copy vectors x and y on device
     double *d_x, *d_y;
     cudaMalloc((void**)&d_x, totalRows * sizeof(double));
     cudaMalloc((void**)&d_y, totalRows * sizeof(double));
     cudaMemcpy(d_x, xHost, N * sizeof(double), cudaMemcpyHostToDevice);
 
-    // Allocazione dell'array dei blocchi su device
+    // Allocate block array on device
     EllpackBlock *d_blocks;
     cudaMalloc((void**)&d_blocks, hllHost->numBlocks * sizeof(EllpackBlock));
 
-    // Preparo una copia host (temporanea) dei blocchi con i puntatori device
+    // Create a temporary host copy of blocks with device pointers
     EllpackBlock *h_blocksDevice = (EllpackBlock *) malloc(hllHost->numBlocks * sizeof(EllpackBlock));
     for (int b = 0; b < hllHost->numBlocks; b++) {
         int sizeBlock = hllHost->blocks[b].block_rows * hllHost->blocks[b].maxnz;
@@ -206,21 +212,23 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
         double *d_AS;
         cudaMalloc((void**)&d_JA, sizeBlock * sizeof(int));
         cudaMalloc((void**)&d_AS, sizeBlock * sizeof(double));
-        // Copia dei dati degli array JA e AS per il blocco corrente
+
+        // Copy JA and AS arrays for the current block
         cudaMemcpy(d_JA, hllHost->blocks[b].JA, sizeBlock * sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_AS, hllHost->blocks[b].AS, sizeBlock * sizeof(double), cudaMemcpyHostToDevice);
 
-        // Imposto il blocco nel vettore temporaneo, con i puntatori aggiornati (device)
+        // Set the block in the temp array with updated device pointers
         h_blocksDevice[b].block_rows = hllHost->blocks[b].block_rows;
         h_blocksDevice[b].N = hllHost->blocks[b].N;
         h_blocksDevice[b].maxnz = hllHost->blocks[b].maxnz;
         h_blocksDevice[b].JA = d_JA;
         h_blocksDevice[b].AS = d_AS;
     }
-    // Copia dell'array dei blocchi (con i puntatori device) su device
+
+    // Copy the block array to the device
     cudaMemcpy(d_blocks, h_blocksDevice, hllHost->numBlocks * sizeof(EllpackBlock), cudaMemcpyHostToDevice);
 
-    // Costruisco la struttura HLLMatrix sul device
+    // Construct the HLLMatrix structure on device
     HLLMatrix hllDevice;
     hllDevice.hackSize = hllHost->hackSize;
     hllDevice.numBlocks = hllHost->numBlocks;
@@ -229,19 +237,19 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
     cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
 
-    // Configurazione per il calcolo del tempo di esecuzione
+    // Configure timers for performance measurement
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    // Lancio del kernel: un thread per riga globale
+    // Launch kernel: one thread per global row
     int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
     cudaEventRecord(start, 0);
 
     spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
-    // Controlla errori di lancio kernel
+    // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
         fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
@@ -249,14 +257,13 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     }
 
     cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
-        
+    cudaEventSynchronize(stop);  
     cudaEventElapsedTime(elapsed_time, start, stop);
 
-    // Copia del vettore risultato y da device a host
+    // Copy result vector y from device to host
     cudaMemcpy(yHost, d_y, totalRows * sizeof(double), cudaMemcpyDeviceToHost);
 
-    // Liberazione della memoria device per ciascun blocco
+    // Free device memory for each block
     for (int b = 0; b < hllHost->numBlocks; b++) {
         cudaFree(h_blocksDevice[b].JA);
         cudaFree(h_blocksDevice[b].AS);
@@ -270,5 +277,3 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     cudaFree(d_x);
     cudaFree(d_y);
 }
-
-
