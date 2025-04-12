@@ -102,6 +102,14 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     // Convert matrix from COO to HLL format
     HLLMatrix *hll = convert_coo_to_hll(mat, HACKSIZE);
 
+    int *block_bounds = malloc((num_threads + 1) * sizeof(int));
+    if (block_bounds == NULL) {
+        fprintf(stderr, "Allocation error for row_bounds.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    generate_block_bounds(hll->numBlocks, num_threads, block_bounds);
+
     // Allocate output vector for OpenMP HLL result
     double *y_hll = calloc(rows, sizeof(double)); 
     if (!y_hll) {
@@ -112,7 +120,8 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     // Run the OpenMP HLL version and measure execution time
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        prod_openmp_hll(hll, x, y_hll);
+        //prod_openmp_hll(hll, x, y_hll);
+        prod_openmp_hll_optimized(hll, x, y_hll, block_bounds);
         end_time = omp_get_wtime();
         times[i] = end_time - start_time;
     }
@@ -140,6 +149,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     free(mat->matrix);
     free(mat);
     free(row_bounds);
+    free(block_bounds);
 }
 
 // Function to execute multiple run of the matrix-vector product varying the number of threads from 1 to 40
@@ -231,10 +241,19 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat) {
         // Reset the times array
         memset(times, 0, sizeof(times));
 
+        int *block_bounds = malloc((num_threads + 1) * sizeof(int));
+        if (block_bounds == NULL) {
+            fprintf(stderr, "Allocation error for row_bounds.\n");
+            exit(EXIT_FAILURE);
+        }
+    
+        generate_block_bounds(hll->numBlocks, num_threads, block_bounds);
+
         // Run the OpenMP HLL version and measure execution time
         for (i = 0; i < REPETITIONS; i++) {
             start_time = omp_get_wtime();
-            prod_openmp_hll(hll, x, y_hll);
+            //prod_openmp_hll(hll, x, y_hll);
+            prod_openmp_hll_optimized(hll, x, y_hll, block_bounds);
             end_time = omp_get_wtime();
             times[i] = end_time - start_time;
         }
@@ -251,6 +270,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat) {
         // Compute and save speedup results
         calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, omp_get_max_threads(), nz);
 
+        free(block_bounds);
         free(row_bounds);
     }
 

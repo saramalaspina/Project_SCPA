@@ -74,6 +74,48 @@ void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds)
     row_bounds[num_threads] = M;
 }
 
+void compute_block_bounds_with_nnz(HLLMatrix *hll, int total_nnz, int num_threads, int *block_bounds) {
+    int target_nnz_per_thread = (total_nnz + num_threads - 1) / num_threads;
+
+    // Inizializza la prima posizione di block_bounds
+    block_bounds[0] = 0;
+    int current_nnz = 0;
+
+    // Scorri i blocchi e assegna un range di blocchi a ciascun thread
+    for (int t = 1; t < num_threads; t++) {
+        int target = t * target_nnz_per_thread;
+
+        // Somma i nnz per i blocchi fino a superare il target
+        current_nnz = 0;
+        int b;
+        for (b = block_bounds[t - 1]; b < hll->numBlocks; b++) {
+            EllpackBlock *block = &hll->blocks[b];
+            current_nnz += block->block_rows * block->maxnz;  // nnz nel blocco
+            if (current_nnz >= target) {
+                break;
+            }
+        }
+
+        block_bounds[t] = b;
+    }
+
+    // L'ultimo thread prende il resto dei blocchi
+    block_bounds[num_threads] = hll->numBlocks;
+}
+
+
+void generate_block_bounds(int numBlocks, int num_threads, int *block_bounds) {
+    int blocks_per_thread = numBlocks / num_threads;
+    int remainder = numBlocks % num_threads;
+
+    block_bounds[0] = 0;
+    for (int t = 0; t < num_threads; t++) {
+        int extra = (t < remainder) ? 1 : 0;
+        block_bounds[t + 1] = block_bounds[t] + blocks_per_thread + extra;
+    }
+}
+
+
 // Compares the results of serial and parallel computations
 int check_results(double *y_serial, double *y_parallel, int size) {
     double diff = 0.0;

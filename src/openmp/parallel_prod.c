@@ -63,6 +63,38 @@ void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restri
     }
 }
 
+void prod_openmp_hll_optimized(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds) {
+    int num_threads = omp_get_max_threads();
+
+    #pragma omp parallel num_threads(num_threads)
+    {
+        int tid = omp_get_thread_num();
+
+        // Ogni thread lavora su un sottoinsieme di blocchi
+        for (int b = block_bounds[tid]; b < block_bounds[tid + 1]; b++) {
+            EllpackBlock *block = &hll->blocks[b];
+            int base = b * hll->hackSize;
+
+            for (int i = 0; i < block->block_rows; i++) {
+                int global_row = base + i;
+                double sum = 0.0;
+
+                // Precalcolo dell'indice base per accesso column-major
+                int row_offset = i;
+
+                for (int j = 0; j < block->maxnz; j++) {
+                    int idx = j * block->block_rows + row_offset;
+                    int col = block->JA[idx];
+                    sum += block->AS[idx] * x[col];
+                }
+
+                y[global_row] = sum;
+            }
+        }
+    }
+}
+
+
 
     
 

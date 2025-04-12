@@ -59,6 +59,7 @@ void print_result(double *y, int M);
 int check_results(double *y_serial, double *y_parallel, int size);
 int compare_coo(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
+void generate_block_bounds(int numBlocks, int num_threads, int *block_bounds);
 
 //reader
 MatrixElement* read_matrix(char* filename);
@@ -69,6 +70,7 @@ void prod_serial(int M, CSRMatrix *csr, double *x, double *y);
 //parallel product openmp
 void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds);
 void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y);
+void prod_openmp_hll_optimized(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds);
 
 //parallel product cuda
 #define THREADS_PER_BLOCK 256
