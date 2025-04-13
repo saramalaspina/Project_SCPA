@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <omp.h>
+#include <math.h>
 
 #include "../../lib/utils.h" 
 
@@ -108,7 +109,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         exit(EXIT_FAILURE);
     }
 
-    generate_block_bounds(hll->numBlocks, num_threads, block_bounds);
+    compute_block_bounds(hll->numBlocks, num_threads, block_bounds);
 
     // Allocate output vector for OpenMP HLL result
     double *y_hll = calloc(rows, sizeof(double)); 
@@ -247,7 +248,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat) {
             exit(EXIT_FAILURE);
         }
     
-        generate_block_bounds(hll->numBlocks, num_threads, block_bounds);
+        compute_block_bounds(hll->numBlocks, num_threads, block_bounds);
 
         // Run the OpenMP HLL version and measure execution time
         for (i = 0; i < REPETITIONS; i++) {

@@ -59,7 +59,8 @@ void print_result(double *y, int M);
 int check_results(double *y_serial, double *y_parallel, int size);
 int compare_coo(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
-void generate_block_bounds(int numBlocks, int num_threads, int *block_bounds);
+void compute_block_bounds(int numBlocks, int num_threads, int *block_bounds);
+
 
 //reader
 MatrixElement* read_matrix(char* filename);

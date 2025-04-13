@@ -74,46 +74,26 @@ void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds)
     row_bounds[num_threads] = M;
 }
 
-void compute_block_bounds_with_nnz(HLLMatrix *hll, int total_nnz, int num_threads, int *block_bounds) {
-    int target_nnz_per_thread = (total_nnz + num_threads - 1) / num_threads;
-
-    // Inizializza la prima posizione di block_bounds
-    block_bounds[0] = 0;
-    int current_nnz = 0;
-
-    // Scorri i blocchi e assegna un range di blocchi a ciascun thread
-    for (int t = 1; t < num_threads; t++) {
-        int target = t * target_nnz_per_thread;
-
-        // Somma i nnz per i blocchi fino a superare il target
-        current_nnz = 0;
-        int b;
-        for (b = block_bounds[t - 1]; b < hll->numBlocks; b++) {
-            EllpackBlock *block = &hll->blocks[b];
-            current_nnz += block->block_rows * block->maxnz;  // nnz nel blocco
-            if (current_nnz >= target) {
-                break;
-            }
-        }
-
-        block_bounds[t] = b;
-    }
-
-    // L'ultimo thread prende il resto dei blocchi
-    block_bounds[num_threads] = hll->numBlocks;
-}
-
-
-void generate_block_bounds(int numBlocks, int num_threads, int *block_bounds) {
+// Computes block boundaries for dividing HLL matrix blocks among threads
+void compute_block_bounds(int numBlocks, int num_threads, int *block_bounds) {
+    // Calculate how many blocks each thread should handle 
     int blocks_per_thread = numBlocks / num_threads;
+
+    // Calculate how many blocks remain after even distribution
     int remainder = numBlocks % num_threads;
 
     block_bounds[0] = 0;
+
+    // Distribute blocks among threads
     for (int t = 0; t < num_threads; t++) {
+        // Distribute the remainder: the first 'remainder' threads get 1 extra block
         int extra = (t < remainder) ? 1 : 0;
+
+        // Each thread gets blocks_per_thread + extra blocks
         block_bounds[t + 1] = block_bounds[t] + blocks_per_thread + extra;
     }
 }
+
 
 
 // Compares the results of serial and parallel computations
