@@ -50,6 +50,7 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize);
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
 void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time,  char *filename);
 void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
+void preprocessing_performance_openmp(char *matrix_name, int nz, char *type, double time_pre, double time_prod, double time_prod_guided, int num_threads);
 
 //utils 
 double *generate_vector(int N);
@@ -61,7 +62,6 @@ int compare_coo(const void *a, const void *b);
 void compute_row_bounds(CSRMatrix *csr, int M, int num_threads, int *row_bounds);
 void compute_block_bounds(int numBlocks, int num_threads, int *block_bounds);
 
-
 //reader
 MatrixElement* read_matrix(char* filename);
 
@@ -69,9 +69,10 @@ MatrixElement* read_matrix(char* filename);
 void prod_serial(int M, CSRMatrix *csr, double *x, double *y);
 
 //parallel product openmp
+void prod_openmp_csr_guided(const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, int num_rows);
 void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds);
-void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y);
-void prod_openmp_hll_optimized(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds);
+void prod_openmp_hll_guided(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y);
+void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds);
 
 //parallel product cuda
 #define THREADS_PER_BLOCK 256

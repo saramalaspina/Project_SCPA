@@ -28,11 +28,11 @@ void calculate_performance_openmp(double *times, MatrixElement *mat, char *matri
     double flops = (2.0 * mat->nz) / total_time;
     double gflops = flops / 1e9;
 
-    printf("Risultati: gflops %.17g\n", gflops);
+    printf("Results: gflops %.17g\n", gflops);
 
     FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
-        perror("Errore nell'apertura del file CSV");
+        perror("Error opening file CSV");
         exit(1);
     }
 
@@ -64,11 +64,11 @@ void calculate_performance_cuda(double *times, MatrixElement *mat, const char *m
     double flops = (2.0 * mat->nz) / (total_time/1000);
     double gflops = flops / 1e9;
 
-    printf("Risultati: gflops %.17g\n", gflops);
+    printf("Results: gflops %.17g\n", gflops);
 
     FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
-        perror("Errore nell'apertura del file CSV");
+        perror("Error opening file CSV");
         exit(1);
     }
   
@@ -94,7 +94,7 @@ void calculate_speedup(const char* matrix_name, double time_serial, double time_
 
     FILE *fp = fopen(file, "a");
     if (fp == NULL) {
-        perror("Errore nell'apertura del file CSV");
+        perror("Error opening file CSV");
         return;
     }
 
@@ -112,4 +112,20 @@ void calculate_speedup(const char* matrix_name, double time_serial, double time_
    
     fclose(fp);    
     
+}
+
+void preprocessing_performance_openmp(char *matrix_name, int nz, char *type, double time_pre, double time_prod, double time_prod_guided, int num_threads){
+    FILE *fp = fopen("results/openmp/preprocessing.csv", "a");
+    if (fp == NULL) {
+        perror("Error opening file CSV");
+        exit(1);
+    }
+
+    if (file_is_empty(fp)) {
+        fprintf(fp, "matrix, nz, type, preTimeBound, avgTimeBound, avgTimeGuided, nThreads\n");
+    }
+    fprintf(fp, "%s, %d, %s, %.6f, %.6f, %.6f, %d\n", matrix_name, nz, type, time_pre, time_prod, time_prod_guided, num_threads);
+
+    fclose(fp);    
+
 }

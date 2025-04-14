@@ -14,9 +14,6 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     int cols = mat->N;
     int nz = mat->nz;
 
-    char *filename_p = "results/openmp/performance.csv";
-    char *filename_s = "results/openmp/speedup.csv";
-
     // Generate input vector x
     double *x = generate_vector(cols);
 
@@ -29,7 +26,9 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     double *time_serial = (double *) malloc(sizeof(double));
     double *time_csr = (double *) malloc(sizeof(double));
     double *time_hll = (double *) malloc(sizeof(double));
-    if (!time_serial || !time_csr || !time_hll) {
+    double *time_csr_guided = (double *) malloc(sizeof(double));
+    double *time_hll_guided = (double *) malloc(sizeof(double));
+    if (!time_serial || !time_csr || !time_hll || !time_csr_guided || !time_hll_guided) {
         fprintf(stderr, "Memory allocation error\n");
         exit(EXIT_FAILURE);
     }
@@ -55,7 +54,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         times[i] = end_time - start_time;
     }
 
-    calculate_performance_openmp(times, mat, matrix_name, "serial", 1, time_serial, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "serial", 1, time_serial, "results/openmp/performance.csv");
     
     // Reset the times array
     memset(times, 0, sizeof(times));
@@ -74,7 +73,10 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         exit(EXIT_FAILURE);
     }
 
+    start_time = omp_get_wtime();
     compute_row_bounds(csr, rows, num_threads, row_bounds);
+    end_time = omp_get_wtime();
+    double pre_time_csr = end_time - start_time;
 
     // Run the OpenMP CSR version and measure execution time
     for (i = 0; i < REPETITIONS; i++) {
@@ -91,11 +93,31 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         printf("CSR results checked\n");
     }
 
-    calculate_performance_openmp(times, mat, matrix_name, "CSR", num_threads, time_csr, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "CSR", num_threads, time_csr, "results/openmp/performance.csv");
+
+    memset(times, 0, sizeof(times));
+
+    // Run the OpenMP CSR guided version and measure execution time
+    for (i = 0; i < REPETITIONS; i++) {
+        start_time = omp_get_wtime();
+        prod_openmp_csr_guided(csr, x, y_csr, rows);
+        end_time = omp_get_wtime();
+        times[i] = end_time - start_time;
+    }
+
+    // Verify correctness of CSR OpenMP result
+    if (check_results(y_serial, y_csr, rows) == 0) {
+        printf("Serial result is different from parallel result with csr (guided)\n");
+    } else {
+        printf("CSR (guided) results checked\n");
+    }
+
+    calculate_performance_openmp(times, mat, matrix_name, "CSR", num_threads, time_csr_guided, "results/openmp/performance_guided.csv");    
 
     // Free CSR-related resources
     free(y_csr);
     free_csr_matrix(csr);
+    free(row_bounds);
 
     // Reset the times array
     memset(times, 0, sizeof(times));
@@ -105,11 +127,14 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
 
     int *block_bounds = malloc((num_threads + 1) * sizeof(int));
     if (block_bounds == NULL) {
-        fprintf(stderr, "Allocation error for row_bounds.\n");
+        fprintf(stderr, "Allocation error for block_bounds.\n");
         exit(EXIT_FAILURE);
     }
 
+    start_time = omp_get_wtime();
     compute_block_bounds(hll->numBlocks, num_threads, block_bounds);
+    end_time = omp_get_wtime();
+    double pre_time_hll = end_time - start_time;
 
     // Allocate output vector for OpenMP HLL result
     double *y_hll = calloc(rows, sizeof(double)); 
@@ -121,8 +146,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     // Run the OpenMP HLL version and measure execution time
     for (i = 0; i < REPETITIONS; i++) {
         start_time = omp_get_wtime();
-        //prod_openmp_hll(hll, x, y_hll);
-        prod_openmp_hll_optimized(hll, x, y_hll, block_bounds);
+        prod_openmp_hll(hll, x, y_hll, block_bounds);
         end_time = omp_get_wtime();
         times[i] = end_time - start_time;
     }
@@ -134,10 +158,36 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
         printf("HLL results checked\n");
     }
 
-    calculate_performance_openmp(times, mat, matrix_name, "HLL", num_threads, time_hll, filename_p);
+    calculate_performance_openmp(times, mat, matrix_name, "HLL", num_threads, time_hll, "results/openmp/performance.csv");
+
+    // Reset the times array
+    memset(times, 0, sizeof(times));
+
+    // Run the OpenMP HLL guided version and measure execution time
+    for (i = 0; i < REPETITIONS; i++) {
+        start_time = omp_get_wtime();
+        prod_openmp_hll_guided(hll, x, y_hll);
+        end_time = omp_get_wtime();
+        times[i] = end_time - start_time;
+    }
+
+    // Verify correctness of HLL OpenMP result
+    if (check_results(y_serial, y_hll, rows) == 0) {
+        printf("Serial result is different from parallel result with hll (guided)\n");
+    } else {
+        printf("HLL (guided) results checked\n");
+    }
+
+    calculate_performance_openmp(times, mat, matrix_name, "HLL", num_threads, time_hll_guided, "results/openmp/performance_guided.csv");
 
     // Compute and save speedup results
-    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, filename_s, num_threads, nz);
+    printf("Calculate speedup\n");
+    calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/openmp/speedup.csv", num_threads, nz);
+    printf("Calculate speedup (guided)\n");
+    calculate_speedup(matrix_name, *time_serial, *time_csr_guided, *time_hll_guided, "results/openmp/speedup_guided.csv", num_threads, nz);
+
+    preprocessing_performance_openmp(matrix_name, nz, "CSR", pre_time_csr, *time_csr, *time_csr_guided, num_threads);
+    preprocessing_performance_openmp(matrix_name, nz, "HLL", pre_time_hll, *time_hll, *time_hll_guided, num_threads);
 
     // Free all allocated memory
     free(time_serial);
@@ -149,7 +199,6 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     free(x);
     free(mat->matrix);
     free(mat);
-    free(row_bounds);
     free(block_bounds);
 }
 
@@ -253,8 +302,7 @@ void run_all_threads_execution(char *matrix_name, MatrixElement *mat) {
         // Run the OpenMP HLL version and measure execution time
         for (i = 0; i < REPETITIONS; i++) {
             start_time = omp_get_wtime();
-            //prod_openmp_hll(hll, x, y_hll);
-            prod_openmp_hll_optimized(hll, x, y_hll, block_bounds);
+            prod_openmp_hll(hll, x, y_hll, block_bounds);
             end_time = omp_get_wtime();
             times[i] = end_time - start_time;
         }

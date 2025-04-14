@@ -4,6 +4,9 @@ MODE=0  # single execution for a specified number of threads
 # Clear previous results
 > results/openmp/performance.csv
 > results/openmp/speedup.csv
+> results/openmp/performance_guided.csv
+> results/openmp/speedup_guided.csv
+> results/openmp/preprocessing.csv
 
 # List of matrix paths
 MATRICES=(

@@ -4,6 +4,26 @@
 #include <stdlib.h>
 #include <omp.h>
 
+// Performs sparse matrix-vector multiplication using the CSR format in parallel with OpenMP
+void prod_openmp_csr_guided(const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, int num_rows) {
+
+    // Parallelize over rows using OpenMP
+    #pragma omp parallel for schedule(guided)
+    for (int i = 0; i < num_rows; i++) {
+        double sum = 0.0;
+        int start = csr->IRP[i];     
+        int end   = csr->IRP[i + 1]; 
+
+        // Iterate over non-zero elements in the row
+        for (int j = start; j < end; j++) {
+            int col = csr->JA[j];       // Column index
+            sum += csr->AS[j] * x[col]; // Multiply and accumulate
+        }
+
+        y[i] = sum; // Store result in output vector
+    }
+}
+
 
  // Performs sparse matrix-vector multiplication using the CSR format in parallel with OpenMP
 void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ row_bounds) {
@@ -31,7 +51,7 @@ void prod_openmp_csr(int M, const CSRMatrix * __restrict__ csr, const double * _
 }
 
 // Performs sparse matrix-vector multiplication using the HLL format (with ELLPACK block) in parallel with OpenMP
-void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y) {
+void prod_openmp_hll_guided(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y) {
 
     // Parallelize over blocks using OpenMP, with guided scheduling to balance workload dynamically
     #pragma omp parallel for schedule(guided)
@@ -62,7 +82,7 @@ void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restri
 
 
 // Performs sparse matrix-vector multiplication using the HLL format (with ELLPACK block) in parallel with OpenMP
-void prod_openmp_hll_optimized(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds) {
+void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds) {
     int num_threads = omp_get_max_threads();
 
     // Start a parallel region with a fixed number of threads
