@@ -67,6 +67,18 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    double *time_csr_warp = (double *) malloc(sizeof(double));
+    if(time_csr == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double *time_hll_warp = (double *) malloc(sizeof(double));
+    if(time_hll == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Sort the matrix in COO format
     qsort(mat->matrix, nz, sizeof(COOElement), compare_coo);
     
@@ -88,7 +100,7 @@ int main(int argc, char *argv[]) {
         times[i] = ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000;
     }
 
-    calculate_performance_cuda(times, mat, matrix_name, "serial", time_serial);
+    calculate_performance_cuda(times, mat, matrix_name, "serial", time_serial, "results/cuda/performance.csv");
     
     // Reset the times array
     memset(times, 0, REPETITIONS * sizeof(double));
@@ -121,8 +133,28 @@ int main(int argc, char *argv[]) {
     }
 
     // Calculate average time for CUDA CSR
-    calculate_performance_cuda(times, mat, matrix_name, "CSR", time_csr);
+    calculate_performance_cuda(times, mat, matrix_name, "CSR", time_csr, "results/cuda/performance.csv");
 
+    // Reset times array
+    memset(times, 0, REPETITIONS * sizeof(double));
+
+
+    // Run CUDA CSR version with warp and measure execution time
+    for (i = 0; i < REPETITIONS; i++) {
+        prod_cuda_csr_warp(rows, cols, csr, x, y_csr, elapsed_time_csr);
+        times[i] = *elapsed_time_csr;
+    }
+    
+    // Verify correctness of CSR CUDA result
+    if(check_results(y_serial, y_csr, rows) == 0){
+        printf("Serial result is different from parallel result with csr (warp)\n");
+    } else {
+        printf("CSR (warp) results checked\n");
+    }
+    
+    // Calculate average time for CUDA CSR
+    calculate_performance_cuda(times, mat, matrix_name, "CSR", time_csr_warp, "results/cuda/performance_warp.csv");
+    
     // Reset times array
     memset(times, 0, REPETITIONS * sizeof(double));
 
@@ -161,16 +193,39 @@ int main(int argc, char *argv[]) {
         printf("HLL results checked\n");
     }
 
-    calculate_performance_cuda(times, mat, matrix_name, "HLL", time_hll);
+    calculate_performance_cuda(times, mat, matrix_name, "HLL", time_hll, "results/cuda/performance.csv");
+
+    // Reset times array
+    memset(times, 0, REPETITIONS * sizeof(double));
+
+    // Run CUDA HLL version with warp and measure execution time
+    for (i = 0; i < REPETITIONS; i++) {
+        prod_cuda_hll_warp(hll, x, y_hll, rows, elapsed_time_hll);
+        times[i] = *elapsed_time_hll;
+    }
+
+    // Verify correctness of HLL CUDA result
+    if(check_results(y_serial, y_hll, rows) == 0){
+        printf("Serial result is different from parallel result with hll (warp)\n");
+    } else {
+        printf("HLL (warp) results checked\n");
+    }
+
+    calculate_performance_cuda(times, mat, matrix_name, "HLL", time_hll_warp, "results/cuda/performance_warp.csv");
 
     // Compute and save speedup results
+    printf("Calculate speedup\n");
     calculate_speedup(matrix_name, *time_serial, *time_csr, *time_hll, "results/cuda/speedup.csv", 0, nz);
+    printf("Calculate speedup (warp)\n");
+    calculate_speedup(matrix_name, *time_serial, *time_csr_warp, *time_hll_warp, "results/cuda/speedup_warp.csv", 0, nz);
 
     // Free all allocated memory
     free(times);
     free(time_serial);
     free(time_csr);
     free(time_hll);
+    free(time_csr_warp);
+    free(time_hll_warp);
     free(elapsed_time_hll);
     free(y_serial);
     free(y_hll);

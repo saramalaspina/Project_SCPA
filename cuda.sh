@@ -2,6 +2,8 @@
 
 > results/cuda/performance.csv
 > results/cuda/speedup.csv
+> results/cuda/performance_warp.csv
+> results/cuda/speedup_warp.csv
 
 # List of matrix paths
 MATRICES=(

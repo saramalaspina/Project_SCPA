@@ -69,43 +69,81 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    if (avg_nz_row < 16) {
-        // Launch the thread-per-row kernel
-        int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
-        cudaEventRecord(start, 0);
 
-        spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+    // Launch the thread-per-row kernel
+    int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    cudaEventRecord(start, 0);
 
-        // Check for kernel launch errors
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess) {
-           fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
-           exit(EXIT_FAILURE);
-        }
+    spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
 
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-        cudaEventElapsedTime(elapsed_time, start, stop);
+    // Check for kernel launch errors
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
 
-    } else {
-        // Launch warp-level kernel
-        int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(elapsed_time, start, stop);
+ 
+    cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
+    
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    cudaFree(d_IRP);
+    cudaFree(d_JA);
+    cudaFree(d_AS);
+    cudaFree(d_x);
+    cudaFree(d_y);
+}
 
-        cudaEventRecord(start, 0);
+// Host function to compute the product using CUDA with warp with CSR format 
+void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+    int *IRP = csr->IRP;
+    int *JA = csr->JA;
+    double *AS = csr->AS;
 
-        spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+    int *d_IRP, *d_JA;
+    double *d_AS, *d_x, *d_y;
+    
+    cudaMalloc(&d_IRP, (M + 1) * sizeof(int));
+    cudaMalloc(&d_JA, IRP[M] * sizeof(int));
+    cudaMalloc(&d_AS, IRP[M] * sizeof(double));
+    cudaMalloc(&d_x, N * sizeof(double));
+    cudaMalloc(&d_y, M * sizeof(double));
+    
+    cudaMemcpy(d_IRP, IRP, (M + 1) * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_JA, JA, IRP[M] * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_AS, AS, IRP[M] * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, x, N * sizeof(double), cudaMemcpyHostToDevice);
+
+    int nz = csr->IRP[M];
+    // Average number of non-zeros per row
+    double avg_nz_row = (double)nz / M; 
+
+    // Configure timers to measure execution time
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    // Launch warp-level kernel
+    int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+
+    cudaEventRecord(start, 0);
+
+    spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
         
-        // Check for kernel launch errors
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess) {
-            fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
-            exit(EXIT_FAILURE);
-        }
+    // Check for kernel launch errors
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "Kernel launch error (warp-level): %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
 
-        cudaEventRecord(stop, 0);
-        cudaEventSynchronize(stop);
-        cudaEventElapsedTime(elapsed_time, start, stop);
-    } 
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(elapsed_time, start, stop);
  
     cudaMemcpy(y, d_y, M * sizeof(double), cudaMemcpyDeviceToHost);
     
@@ -248,6 +286,94 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     cudaEventRecord(start, 0);
 
     spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+
+    // Check for kernel launch errors
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        fprintf(stderr, "Kernel launch error: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);  
+    cudaEventElapsedTime(elapsed_time, start, stop);
+
+    // Copy result vector y from device to host
+    cudaMemcpy(yHost, d_y, totalRows * sizeof(double), cudaMemcpyDeviceToHost);
+
+    // Free device memory for each block
+    for (int b = 0; b < hllHost->numBlocks; b++) {
+        cudaFree(h_blocksDevice[b].JA);
+        cudaFree(h_blocksDevice[b].AS);
+    }
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    free(h_blocksDevice);
+    cudaFree(d_blocks);
+    cudaFree(d_hll);
+    cudaFree(d_x);
+    cudaFree(d_y);
+}
+
+// Host function to compute matrix-vector product using CUDA with warp and HLL format
+void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
+    int N = hllHost->blocks[0].N;
+
+    // Allocate and copy vectors x and y on device
+    double *d_x, *d_y;
+    cudaMalloc((void**)&d_x, totalRows * sizeof(double));
+    cudaMalloc((void**)&d_y, totalRows * sizeof(double));
+    cudaMemcpy(d_x, xHost, N * sizeof(double), cudaMemcpyHostToDevice);
+
+    // Allocate block array on device
+    EllpackBlock *d_blocks;
+    cudaMalloc((void**)&d_blocks, hllHost->numBlocks * sizeof(EllpackBlock));
+
+    // Create a temporary host copy of blocks with device pointers
+    EllpackBlock *h_blocksDevice = (EllpackBlock *) malloc(hllHost->numBlocks * sizeof(EllpackBlock));
+    for (int b = 0; b < hllHost->numBlocks; b++) {
+        int sizeBlock = hllHost->blocks[b].block_rows * hllHost->blocks[b].maxnz;
+        int *d_JA;
+        double *d_AS;
+        cudaMalloc((void**)&d_JA, sizeBlock * sizeof(int));
+        cudaMalloc((void**)&d_AS, sizeBlock * sizeof(double));
+
+        // Copy JA and AS arrays for the current block
+        cudaMemcpy(d_JA, hllHost->blocks[b].JA, sizeBlock * sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_AS, hllHost->blocks[b].AS, sizeBlock * sizeof(double), cudaMemcpyHostToDevice);
+
+        // Set the block in the temp array with updated device pointers
+        h_blocksDevice[b].block_rows = hllHost->blocks[b].block_rows;
+        h_blocksDevice[b].N = hllHost->blocks[b].N;
+        h_blocksDevice[b].maxnz = hllHost->blocks[b].maxnz;
+        h_blocksDevice[b].JA = d_JA;
+        h_blocksDevice[b].AS = d_AS;
+    }
+
+    // Copy the block array to the device
+    cudaMemcpy(d_blocks, h_blocksDevice, hllHost->numBlocks * sizeof(EllpackBlock), cudaMemcpyHostToDevice);
+
+    // Construct the HLLMatrix structure on device
+    HLLMatrix hllDevice;
+    hllDevice.hackSize = hllHost->hackSize;
+    hllDevice.numBlocks = hllHost->numBlocks;
+    hllDevice.blocks = d_blocks;
+    HLLMatrix *d_hll;
+    cudaMalloc((void**)&d_hll, sizeof(HLLMatrix));
+    cudaMemcpy(d_hll, &hllDevice, sizeof(HLLMatrix), cudaMemcpyHostToDevice);
+
+    // Configure timers for performance measurement
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    // Launch warp-level kernel
+    int blocks = (totalRows * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+
+    cudaEventRecord(start, 0);
+
+    spmv_hll_kernel_warp<<<blocks, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
     // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();

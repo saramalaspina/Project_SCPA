@@ -48,7 +48,7 @@ void calculate_performance_openmp(double *times, MatrixElement *mat, char *matri
 }
 
 
-void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time){
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time, char *filename){
     double total_time = 0.0;
 
     // Sum execution time in each repetition, excluding the first ten due to initial overhead factors
@@ -66,7 +66,7 @@ void calculate_performance_cuda(double *times, MatrixElement *mat, const char *m
 
     printf("Risultati: gflops %.17g\n", gflops);
 
-    FILE *fp = fopen("results/cuda/performance.csv", "a");
+    FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
         perror("Errore nell'apertura del file CSV");
         exit(1);

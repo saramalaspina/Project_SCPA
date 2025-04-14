@@ -48,7 +48,7 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize);
 
 //performance
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
-void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time);
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time,  char *filename);
 void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
 
 //utils 
@@ -78,7 +78,9 @@ void prod_openmp_hll_optimized(const HLLMatrix * __restrict__ hll, const double 
 #define WARP_SIZE 32
 
 void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
+void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
 void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
+void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
 
 #ifdef __cplusplus
 }
