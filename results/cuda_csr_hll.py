@@ -2,33 +2,48 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-sns.set_theme(style="whitegrid")
+def plot_bar_comparison(csv_path, save_path, nz_threshold=1_000_000):
+    sns.set_theme(style="whitegrid")
 
-df = pd.read_csv("cuda/performance.csv")
-df.columns = df.columns.str.strip()
-df['type'] = df['type'].str.strip()
+    # Caricamento dati
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    df['type'] = df['type'].str.strip()
 
-# Filter to keep only the parallel types (CSR and HLL)
-df_parallel = df[df['type'].str.upper().isin(['CSR', 'HLL'])]
+    # Filtra solo i tipi paralleli (CSR e HLL)
+    df_parallel = df[df['type'].str.upper().isin(['CSR', 'HLL'])]
 
-# Define the nz threshold and split the data into two groups
-nz_threshold = 1_000_000
-df_few = df_parallel[df_parallel['nz'] < nz_threshold]
-df_many = df_parallel[df_parallel['nz'] >= nz_threshold]
+    # Soglia nz per separare i dataset
+    df_few = df_parallel[df_parallel['nz'] < nz_threshold]
+    df_many = df_parallel[df_parallel['nz'] >= nz_threshold]
 
-def plot_bar_comparison(data, title, save_path):
-    plt.figure(figsize=(20, 10))
-    sns.barplot(data=data, x='matrix', y='avgGFlops', hue='type')
-    plt.title(title)
-    plt.xlabel("Matrix")
-    plt.ylabel("AvgGFlops")
-    plt.legend(title="Type", bbox_to_anchor=(1.05, 1), loc='upper left')
+    palette = {'CSR': '#1f77b4', 'HLL': '#ff69b4'}
+
+    # Crea la figura con due subplot
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(24, 14))
+
+    # Primo grafico: pochi nz
+    sns.barplot(ax=axes[0], data=df_few, x='matrix', y='avgGFlops', hue='type', palette=palette)
+    axes[0].set_title("Cuda AvgGFlops Comparison (CSR vs HLL) - Few nz (<1e6)")
+    axes[0].set_xlabel("")
+    axes[0].set_ylabel("AvgGFlops")
+    axes[0].legend(title="Type", bbox_to_anchor=(1.01, 1), loc='upper left')
+    axes[0].tick_params(axis='x', rotation=90)
+
+    # Secondo grafico: molti nz
+    sns.barplot(ax=axes[1], data=df_many, x='matrix', y='avgGFlops', hue='type', palette=palette)
+    axes[1].set_title("Cuda AvgGFlops Comparison (CSR vs HLL) - Many nz (>=1e6)")
+    axes[1].set_xlabel("Matrix")
+    axes[1].set_ylabel("AvgGFlops")
+    axes[1].legend(title="Type", bbox_to_anchor=(1.01, 1), loc='upper left')
+    axes[1].tick_params(axis='x', rotation=90)
+
     plt.tight_layout()
-    
-    # Save the plot
+
+    # Salva la figura unica
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"Plot saved to: {save_path}")
+    print(f"Combined plot saved to: {save_path}")
     plt.close()
 
-plot_bar_comparison(df_few, "Cuda AvgGFlops Comparison (CSR vs HLL) for Matrices with Few nz (<1e6)", "cuda/graphs/csr_hll_few_nz.png")
-plot_bar_comparison(df_many, "Cuda AvgGFlops Comparison (CSR vs HLL) for Matrices with Many nz (>=1e6)", "cuda/graphs/csr_hll_many_nz.png")
+plot_bar_comparison("cuda/performance.csv", "cuda/graphs/csr_hll.png")
+plot_bar_comparison("cuda/performance_warp.csv", "cuda/graphs/csr_hll_warp.png")

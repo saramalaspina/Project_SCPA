@@ -16,19 +16,25 @@ nz_threshold = 1_000_000
 df_few = df_parallel[df_parallel['nz'] < nz_threshold]
 df_many = df_parallel[df_parallel['nz'] >= nz_threshold]
 
-def plot_bar_comparison(data, title, save_path):
-    plt.figure(figsize=(20, 10))
-    sns.barplot(data=data, x='matrix', y='avgGFlops', hue='type')
-    plt.title(title)
-    plt.xlabel("Matrix")
-    plt.ylabel("AvgGFlops")
-    plt.legend(title="Type", bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
-    
-    # Save the plot
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"Plot saved to: {save_path}")
-    plt.close()
+# Create a single figure with two subplots (stacked vertically)
+fig, axes = plt.subplots(2, 1, figsize=(24, 16), sharex=False)
 
-plot_bar_comparison(df_few, "OpenMP AvgGFlops Comparison (CSR vs HLL) for Matrices with Few nz (<1e6)", "openmp/graphs/csr_hll_few_nz.png")
-plot_bar_comparison(df_many, "OpenMP AvgGFlops Comparison (CSR vs HLL) for Matrices with Many nz (>=1e6)", "openmp/graphs/csr_hll_many_nz.png")
+# Plot for matrices with few nz
+sns.barplot(ax=axes[0], data=df_few, x='matrix', y='avgGFlops', hue='type')
+axes[0].set_title("OpenMP AvgGFlops Comparison (CSR vs HLL) - Few nz (< 1e6)")
+axes[0].set_xlabel("Matrix")
+axes[0].set_ylabel("AvgGFlops")
+axes[0].legend(title="Type", loc='upper right')
+
+# Plot for matrices with many nz
+sns.barplot(ax=axes[1], data=df_many, x='matrix', y='avgGFlops', hue='type')
+axes[1].set_title("OpenMP AvgGFlops Comparison (CSR vs HLL) - Many nz (>= 1e6)")
+axes[1].set_xlabel("Matrix")
+axes[1].set_ylabel("AvgGFlops")
+axes[1].legend(title="Type", loc='upper right')
+
+# Adjust layout and save
+plt.tight_layout()
+plt.savefig("openmp/graphs/csr_hll_gflops.png", dpi=300, bbox_inches='tight')
+print("Combined plot saved to: openmp/graphs/csr_hll_gflops.png")
+plt.close()
