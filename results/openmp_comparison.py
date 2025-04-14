@@ -2,8 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-sns.set_theme(style="whitegrid", palette="bright", color_codes="")
-
 # Caricamento e pulizia dati
 df_guided = pd.read_csv("openmp/performance_guided.csv")
 df_bound = pd.read_csv("openmp/performance.csv")

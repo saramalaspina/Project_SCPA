@@ -76,7 +76,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     start_time = omp_get_wtime();
     compute_row_bounds(csr, rows, num_threads, row_bounds);
     end_time = omp_get_wtime();
-    double pre_time_csr = end_time - start_time;
+    double pre_time_csr = (end_time - start_time)*1000;
 
     // Run the OpenMP CSR version and measure execution time
     for (i = 0; i < REPETITIONS; i++) {
@@ -134,7 +134,7 @@ void run_single_execution(char *matrix_name, MatrixElement *mat) {
     start_time = omp_get_wtime();
     compute_block_bounds(hll->numBlocks, num_threads, block_bounds);
     end_time = omp_get_wtime();
-    double pre_time_hll = end_time - start_time;
+    double pre_time_hll = (end_time - start_time)*1000;
 
     // Allocate output vector for OpenMP HLL result
     double *y_hll = calloc(rows, sizeof(double)); 
