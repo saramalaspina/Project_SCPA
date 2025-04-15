@@ -17,10 +17,13 @@ df = classify_nz(df)
 
 # Function to plot comparison between guided and bound times
 def plot_time_comparison(type_filter, output_filename):
+    # Set seaborn style
+    sns.set_theme(style="whitegrid")
+
     fig, axs = plt.subplots(2, 1, figsize=(20, 12), sharex=False)
     groups = ['<1M', '≥1M']
-    titles = ['nz < 1M', 'nz ≥ 1M']
-    palette = {'guided': '#1f77b4', 'bound': '#ff69b4'}
+    titles = ['Matrices with Few Non-Zeros (< 1e6)', 'Matrices with Many Non-Zeros (≥ 1e6)']
+    palette = {'guided': '#ffa557', 'bound': '#1f78b4'}
 
     for i, group in enumerate(groups):
         subset = df[(df['type'] == type_filter) & (df['group'] == group)]
@@ -41,19 +44,23 @@ def plot_time_comparison(type_filter, output_filename):
         sns.barplot(data=melted, x='matrix', y='Time (ms)', hue='method', palette=palette, ax=axs[i])
         
         axs[i].set_yscale('log')
-        axs[i].set_title(f"{type_filter} - {titles[i]}")
+        axs[i].set_title(f"{type_filter} OpenMP Scheduling Comparison - {titles[i]}")
+        axs[i].grid(True, axis='y', linestyle='--', linewidth=0.7)
+        axs[i].grid(False, axis='x')
         axs[i].set_ylabel("Execution Time (ms)")
-        axs[i].set_xlabel("")
-        axs[i].tick_params(axis='x', rotation=45)
+        axs[i].set_xlabel("Matrix")
+        axs[i].legend(loc='upper right')
+        for label in axs[i].get_xticklabels():
+            label.set_rotation(0)
 
-    axs[0].legend(title='Method')
+    axs[0].legend(loc='upper left')
     plt.tight_layout()
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
     plt.savefig(output_filename)
     plt.close()
-    print(f"Chart saved: {output_filename}")
+    print(f"Plot saved to: {output_filename}")
 
 # Generate charts
-plot_time_comparison('HLL', 'openmp/graphs/hll_preprocessing_comparison.png')
-plot_time_comparison('CSR', 'openmp/graphs/csr_preprocessing_comparison.png')
+plot_time_comparison('HLL', 'openmp/graphs/hll_scheduling_totaltime.png')
+plot_time_comparison('CSR', 'openmp/graphs/csr_scheduling_totaltime.png')
 
