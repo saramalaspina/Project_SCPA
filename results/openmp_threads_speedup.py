@@ -27,11 +27,12 @@ def plot_speedup(df_few, df_many, algo_type, save_path):
         return
 
     # Create the figure with two subplots
-    fig, axs = plt.subplots(2, 1, figsize=(18, 12), sharex=True)
+    fig, axs = plt.subplots(2, 1, figsize=(18, 12))
 
     # First subplot: matrices with few non-zeros
     sns.lineplot(data=df_few, x='nThreads', y=y_col, hue='matrix', marker='o', ax=axs[0])
     axs[0].set_title(f"{algo_type.upper()} Threads Speedup - Matrices with Few Non-Zeros (< 1e6)")
+    axs[0].set_xlabel("Number of Threads")
     axs[0].set_ylabel("Speedup")
     axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
 

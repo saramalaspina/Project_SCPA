@@ -26,7 +26,7 @@ def plot_performance(df_few, df_many, algo_type, save_path):
         return
 
     # Create the figure with two subplots (vertically stacked)
-    fig, axs = plt.subplots(2, 1, figsize=(18, 12), sharex=True)
+    fig, axs = plt.subplots(2, 1, figsize=(18, 12))
 
     # Top subplot: matrices with few non-zeros
     if not data_few.empty:
