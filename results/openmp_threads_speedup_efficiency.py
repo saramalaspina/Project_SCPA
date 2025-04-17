@@ -62,7 +62,7 @@ def plot_speedup(df_few, df_many, algo_type, save_path):
     # Adjust layout and save to file
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"Speedup plot saved to: {save_path}")
+    print(f"Plot saved to: {save_path}")
     plt.close()
 
 # Function to plot efficiency
@@ -94,7 +94,7 @@ def plot_efficiency(df_few, df_many, algo_type, save_path):
     # Adjust layout and save to file
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"Efficiency plot saved to: {save_path}")
+    print(f"Plot saved to: {save_path}")
     plt.close()
 
 # Create output directory if it doesn't exist
