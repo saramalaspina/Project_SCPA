@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_bar_comparison(csv_path, save_path, nz_threshold=1_000_000):
+def plot_bar_comparison(save_path, csv_path, nz_threshold=1_000_000):
     sns.set_theme(style="whitegrid")
 
     # Caricamento dati
@@ -51,5 +51,4 @@ def plot_bar_comparison(csv_path, save_path, nz_threshold=1_000_000):
     print(f"Plot saved to: {save_path}")
     plt.close()
 
-plot_bar_comparison("cuda/performance.csv", "cuda/graphs/csr_hll_gflops.png")
-plot_bar_comparison("cuda/performance_warp.csv", "cuda/graphs/csr_hll_gflops_warp.png")
+plot_bar_comparison("cuda/graphs/csr_hll_gflops.png", "cuda/best_performance.csv")

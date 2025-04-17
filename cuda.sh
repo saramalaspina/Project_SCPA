@@ -1,9 +1,8 @@
 #!/bin/bash
+MODE=1  # test best execution with a selected value of threads per block
 
-> results/cuda/performance.csv
-> results/cuda/speedup.csv
-> results/cuda/performance_warp.csv
-> results/cuda/speedup_warp.csv
+> results/cuda/best_performance.csv
+> results/cuda/best_speedup.csv
 
 # List of matrix paths
 MATRICES=(
@@ -39,6 +38,7 @@ MATRICES=(
     "roadNet-PA.mtx"
 )
 
+
 echo "Loading modules for CUDA..."
 module -s load gnu mpich cuda
 
@@ -52,7 +52,7 @@ fi
 # Iterate through the list of matrices
 for MATRIX_PATH in "${MATRICES[@]}"; do
     echo "Running CUDA for $MATRIX_PATH..."
-    ./bin/cuda "../matrix/$MATRIX_PATH"
+    ./bin/cuda "../matrix/$MATRIX_PATH" $MODE
 done
 
 echo "CUDA execution completed for all matrices."

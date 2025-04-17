@@ -41,7 +41,7 @@ __global__ void spmv_csr_warp_kernel(int M, int *IRP, int *JA, double *AS, doubl
 }
 
 // Host function to compute the product using CUDA with CSR format
-void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time, int threads_per_block) {
     int *IRP = csr->IRP;
     int *JA = csr->JA;
     double *AS = csr->AS;
@@ -71,10 +71,10 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
 
 
     // Launch the thread-per-row kernel
-    int blocks = (M + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    int blocks = (M + threads_per_block - 1) / threads_per_block;
     cudaEventRecord(start, 0);
 
-    spmv_csr_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+    spmv_csr_kernel<<<blocks, threads_per_block>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
 
     // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();
@@ -99,7 +99,7 @@ void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *el
 }
 
 // Host function to compute the product using CUDA with warp with CSR format 
-void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time) {
+void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time, int threads_per_block) {
     int *IRP = csr->IRP;
     int *JA = csr->JA;
     double *AS = csr->AS;
@@ -128,11 +128,11 @@ void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, floa
     cudaEventCreate(&stop);
 
     // Launch warp-level kernel
-    int blocks = (M * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    int blocks = (M * WARP_SIZE + threads_per_block - 1) / threads_per_block;
 
     cudaEventRecord(start, 0);
 
-    spmv_csr_warp_kernel<<<blocks, THREADS_PER_BLOCK>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
+    spmv_csr_warp_kernel<<<blocks, threads_per_block>>>(M, d_IRP, d_JA, d_AS, d_x, d_y);
         
     // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();
@@ -229,7 +229,7 @@ __global__ void spmv_hll_kernel_warp(int hackSize, int totalRows, EllpackBlock *
 }
 
 // Host function to compute matrix-vector product using CUDA and HLL format
-void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
+void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time, int threads_per_block) {
     int N = hllHost->blocks[0].N;
 
     // Allocate and copy vectors x and y on device
@@ -281,11 +281,11 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
     cudaEventCreate(&stop);
 
     // Launch kernel: one thread per global row
-    int gridSize = (totalRows + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    int gridSize = (totalRows + threads_per_block - 1) / threads_per_block;
 
     cudaEventRecord(start, 0);
 
-    spmv_hll_kernel<<<gridSize, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+    spmv_hll_kernel<<<gridSize, threads_per_block>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
     // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();
@@ -317,7 +317,7 @@ void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost,
 }
 
 // Host function to compute matrix-vector product using CUDA with warp and HLL format
-void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time) {
+void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time, int threads_per_block) {
     int N = hllHost->blocks[0].N;
 
     // Allocate and copy vectors x and y on device
@@ -369,11 +369,11 @@ void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *y
     cudaEventCreate(&stop);
 
     // Launch warp-level kernel
-    int blocks = (totalRows * WARP_SIZE + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+    int blocks = (totalRows * WARP_SIZE + threads_per_block - 1) / threads_per_block;
 
     cudaEventRecord(start, 0);
 
-    spmv_hll_kernel_warp<<<blocks, THREADS_PER_BLOCK>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
+    spmv_hll_kernel_warp<<<blocks, threads_per_block>>>(hllHost->hackSize, totalRows, d_blocks, d_x, d_y);
 
     // Check for kernel launch errors
     cudaError_t err = cudaGetLastError();

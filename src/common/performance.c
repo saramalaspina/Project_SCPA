@@ -48,7 +48,7 @@ void calculate_performance_openmp(double *times, MatrixElement *mat, char *matri
 }
 
 
-void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time, char *filename){
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time, char *filename, int threads_per_block){
     double total_time = 0.0;
 
     // Sum execution time in each repetition, excluding the first ten due to initial overhead factors
@@ -73,9 +73,9 @@ void calculate_performance_cuda(double *times, MatrixElement *mat, const char *m
     }
   
     if (file_is_empty(fp)) {
-        fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops\n");
+        fprintf(fp, "matrix, M, N, nz, type, avgTime, avgGFlops, threadsPerBlock\n");
     }
-    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f\n", matrix_name, mat->M, mat->N, mat->nz, type, total_time, gflops);
+    fprintf(fp, "%s, %d, %d, %d, %s, %.6f, %.6f, %d\n", matrix_name, mat->M, mat->N, mat->nz, type, total_time, gflops, threads_per_block);
 
     fclose(fp);    
 
@@ -98,17 +98,12 @@ void calculate_speedup(const char* matrix_name, double time_serial, double time_
         return;
     }
 
-    if(numThreads != 0){
-        if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, nz, time_serial, speedup_csr, speedup_hll, nThreads\n");
-        }
-        fprintf(fp, "%s, %d, %.6f, %.6f, %.6f, %d\n", matrix_name, nz, time_serial, speedup_csr, speedup_hll, numThreads);
-    } else {
-        if (file_is_empty(fp)) {
-            fprintf(fp, "matrix, nz, time_serial, speedup_csr, speedup_hll\n");
-        }
-        fprintf(fp, "%s, %d, %.6f, %.6f, %.6f\n", matrix_name, nz, time_serial, speedup_csr, speedup_hll);
+
+    if (file_is_empty(fp)) {
+        fprintf(fp, "matrix, nz, time_serial, speedup_csr, speedup_hll, nThreads\n");
     }
+    fprintf(fp, "%s, %d, %.6f, %.6f, %.6f, %d\n", matrix_name, nz, time_serial, speedup_csr, speedup_hll, numThreads);
+    
    
     fclose(fp);    
     

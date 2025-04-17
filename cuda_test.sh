@@ -1,12 +1,10 @@
 #!/bin/bash
-MODE=0  # single execution for a specified number of threads
+MODE=0  # test execution with different threads per block
 
-# Clear previous results
-> results/openmp/performance.csv
-> results/openmp/speedup.csv
-> results/openmp/performance_guided.csv
-> results/openmp/speedup_guided.csv
-> results/openmp/preprocessing.csv
+> results/cuda/performance.csv
+> results/cuda/performance_warp.csv
+> results/cuda/speedup.csv
+> results/cuda/speedup_warp.csv
 
 # List of matrix paths
 MATRICES=(
@@ -42,19 +40,21 @@ MATRICES=(
     "roadNet-PA.mtx"
 )
 
-echo "Compiling and running OpenMP version..."
-make openmp
+
+echo "Loading modules for CUDA..."
+module -s load gnu mpich cuda
+
+echo "Compiling and running CUDA..."
+make cuda
 if [ $? -ne 0 ]; then
-    echo "Error during OpenMP compilation"
+    echo "Error during CUDA compilation"
     exit 1
 fi
 
-export OMP_NUM_THREADS=20
-
-# Iterate over the matrix list
+# Iterate through the list of matrices
 for MATRIX_PATH in "${MATRICES[@]}"; do
-    echo "Running OpenMP for $MATRIX_PATH..."
-    ./bin/openmp "../matrix/$MATRIX_PATH" $MODE
+    echo "Running CUDA for $MATRIX_PATH..."
+    ./bin/cuda "../matrix/$MATRIX_PATH" $MODE
 done
 
-echo "OpenMP execution completed for all matrices."
+echo "CUDA execution completed for all matrices."

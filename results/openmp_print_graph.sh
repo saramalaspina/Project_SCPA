@@ -26,7 +26,7 @@ for module in "${required_modules[@]}"; do
 done
 
 # Run Python scripts
-scripts=("openmp_csr_hll_gflops.py" "openmp_csr_hll_speedup.py" "openmp_scheduling_totaltime.py" "openmp_scheduling.py" "openmp_threads_gflops.py" "openmp_threads_speedup.py")  # Add your Python scripts here
+scripts=("openmp_csr_hll_gflops.py" "openmp_csr_hll_speedup.py" "openmp_scheduling_totaltime.py" "openmp_scheduling.py" "openmp_threads_gflops.py" "openmp_threads_speedup_efficiency.py")  # Add your Python scripts here
 
 for script in "${scripts[@]}"; do
     echo "Running $script..."

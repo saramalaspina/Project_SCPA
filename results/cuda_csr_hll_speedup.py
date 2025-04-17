@@ -54,5 +54,5 @@ def plot_speedup(save_path, filename):
     print(f"Plot saved to: {save_path}")
     plt.close()
 
-plot_speedup("cuda/graphs/csr_hll_speedup.png", "cuda/speedup.csv")
-plot_speedup("cuda/graphs/csr_hll_speedup_warp.png", "cuda/speedup_warp.csv")
+plot_speedup("cuda/graphs/csr_hll_speedup.png", "cuda/best_speedup.csv")
+

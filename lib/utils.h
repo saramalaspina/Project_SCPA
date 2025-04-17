@@ -48,7 +48,7 @@ HLLMatrix *convert_coo_to_hll(MatrixElement *coo, int hackSize);
 
 //performance
 void calculate_performance_openmp(double *times, MatrixElement *mat, char *matrix_name, char *type, int numThreads, double *time, char* filename);
-void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time,  char *filename);
+void calculate_performance_cuda(double *times, MatrixElement *mat, const char *matrix_name, const char *type, double *time,  char *filename, int threads_per_block);
 void calculate_speedup(const char* matrix_name, double time_serial, double time_csr, double time_hll, const char* file, int numThreads, int nz);
 void preprocessing_performance_openmp(char *matrix_name, int nz, char *type, double time_pre, double time_prod, double time_prod_guided, int num_threads);
 
@@ -75,13 +75,13 @@ void prod_openmp_hll_guided(const HLLMatrix * __restrict__ hll, const double * _
 void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restrict__ x, double * __restrict__ y, const int * __restrict__ block_bounds);
 
 //parallel product cuda
-#define THREADS_PER_BLOCK 256
 #define WARP_SIZE 32
+#define THREADS_PER_BLOCK 128
 
-void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
-void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time);
-void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
-void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time);
+void prod_cuda_csr(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time, int threads_per_block);
+void prod_cuda_csr_warp(int M, int N, CSRMatrix *csr, double *x, double *y, float *elapsed_time, int threads_per_block);
+void prod_cuda_hll(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time, int threads_per_block);
+void prod_cuda_hll_warp(const HLLMatrix *hllHost, const double *xHost, double *yHost, int totalRows, float *elapsed_time, int threads_per_block);
 
 #ifdef __cplusplus
 }

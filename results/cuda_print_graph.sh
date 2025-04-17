@@ -26,7 +26,7 @@ for module in "${required_modules[@]}"; do
 done
 
 # Run Python scripts
-scripts=("cuda_csr_hll_speedup.py" "cuda_csr_hll_gflops.py" "cuda_scheduling.py")  # Add your Python scripts here
+scripts=("cuda_csr_hll_speedup.py" "cuda_csr_hll_gflops.py" "cuda_scheduling.py" "cuda_threads_per_block.py")  # Add your Python scripts here
 
 for script in "${scripts[@]}"; do
     echo "Running $script..."
