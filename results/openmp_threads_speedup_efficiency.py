@@ -47,17 +47,17 @@ def plot_speedup(df_few, df_many, algo_type, save_path):
 
     # Plot for sparse matrices
     sns.lineplot(data=df_few, x='nThreads', y=y_col, hue='matrix', marker='o', ax=axs[0])
-    axs[0].set_title(f"{algo_type.upper()} Threads Speedup - Matrices with Few Non-Zeros (< 1e6)")
+    axs[0].set_title(f"OpenMP {algo_type.upper()} Threads Speedup - Matrices with Few Non-Zeros (< 1e6)", fontsize = 15)
     axs[0].set_xlabel("Number of Threads")
     axs[0].set_ylabel("Speedup")
-    axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+    axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
 
     # Plot for dense matrices
     sns.lineplot(data=df_many, x='nThreads', y=y_col, hue='matrix', marker='o', ax=axs[1])
-    axs[1].set_title(f"{algo_type.upper()} Threads Speedup - Matrices with Many Non-Zeros (≥ 1e6)")
+    axs[1].set_title(f"OpenMP {algo_type.upper()} Threads Speedup - Matrices with Many Non-Zeros (≥ 1e6)", fontsize = 15)
     axs[1].set_xlabel("Number of Threads")
     axs[1].set_ylabel("Speedup")
-    axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+    axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
 
     # Adjust layout and save to file
     plt.tight_layout()
@@ -78,18 +78,18 @@ def plot_efficiency(df_few, df_many, algo_type, save_path):
     # Plot for sparse matrices
     sns.lineplot(data=df_few, x='nThreads', y=eff_col, hue='matrix', marker='o', ax=axs[0])
     axs[0].axhline(1.0, color='gray', linestyle='--', linewidth=1)  # Reference line at ideal efficiency
-    axs[0].set_title(f"{algo_type.upper()} Threads Efficiency - Matrices with Few Non-Zeros (< 1e6)")
+    axs[0].set_title(f"OpenMP {algo_type.upper()} Threads Efficiency - Matrices with Few Non-Zeros (< 1e6)", fontsize = 15)
     axs[0].set_xlabel("Number of Threads")
     axs[0].set_ylabel("Efficiency")
-    axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+    axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
 
     # Plot for dense matrices
     sns.lineplot(data=df_many, x='nThreads', y=eff_col, hue='matrix', marker='o', ax=axs[1])
     axs[1].axhline(1.0, color='gray', linestyle='--', linewidth=1)  # Reference line at ideal efficiency
-    axs[1].set_title(f"{algo_type.upper()} Threads Efficiency - Matrices with Many Non-Zeros (≥ 1e6)")
+    axs[1].set_title(f"OpenMP {algo_type.upper()} Threads Efficiency - Matrices with Many Non-Zeros (≥ 1e6)", fontsize = 15)
     axs[1].set_xlabel("Number of Threads")
     axs[1].set_ylabel("Efficiency")
-    axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+    axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
 
     # Adjust layout and save to file
     plt.tight_layout()

@@ -48,12 +48,12 @@ def plot_sched_comparison(type_filter, output_filename):
         # Converte in formato "long" per seaborn
         melted = pd.melt(merged, id_vars='matrix', value_vars=['guided', 'bound'], var_name='method', value_name='GFlops')
         sns.barplot(data=melted, x='matrix', y='GFlops', hue='method', palette=palette, ax=axs[i])
-        axs[i].set_title(f"{type_filter} OpenMP Scheduling Comparison - {titles[i]}")
+        axs[i].set_title(f"OpenMP {type_filter} Scheduling Comparison - {titles[i]}", fontsize=18)
         axs[i].grid(True, axis='y', linestyle='--', linewidth=0.7)
         axs[i].grid(False, axis='x')
-        axs[i].set_ylabel("GFlops")
+        axs[i].set_ylabel("GigaFlops")
         axs[i].set_xlabel("Matrix")
-        axs[i].legend(loc='upper right')
+        axs[i].legend(loc='upper right', fontsize=16, title_fontsize=18)
         for label in axs[i].get_xticklabels():
             label.set_rotation(0)
 

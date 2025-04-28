@@ -31,20 +31,20 @@ def plot_performance(df_few, df_many, algo_type, save_path):
     # Top subplot: matrices with few non-zeros
     if not data_few.empty:
         sns.lineplot(data=data_few, x='nThreads', y='avgGFlops', hue='matrix', marker='o', ax=axs[0])
-        axs[0].set_title(f"{algo_type.upper()} Threads Performance - Matrices with Few Non-Zeros (< 1e6)")
+        axs[0].set_title(f"OpenMP {algo_type.upper()} Threads GigaFlops - Matrices with Few Non-Zeros (< 1e6)", fontsize = 15)
         axs[0].set_xlabel("Number of Threads")
-        axs[0].set_ylabel("GFlops")
-        axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+        axs[0].set_ylabel("GigaFlops")
+        axs[0].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
     else:
         axs[0].set_visible(False)
 
     # Bottom subplot: matrices with many non-zeros
     if not data_many.empty:
         sns.lineplot(data=data_many, x='nThreads', y='avgGFlops', hue='matrix', marker='o', ax=axs[1])
-        axs[1].set_title(f"{algo_type.upper()} Threads Performance - Matrices with Many Non-Zeros (≥ 1e6)")
+        axs[1].set_title(f"OpenMP {algo_type.upper()} Threads GigaFlops - Matrices with Many Non-Zeros (≥ 1e6)", fontsize = 15)
         axs[1].set_xlabel("Number of Threads")
-        axs[1].set_ylabel("GFlops")
-        axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+        axs[1].set_ylabel("GigaFlops")
+        axs[1].legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=13, title_fontsize=14)
     else:
         axs[1].set_visible(False)
 

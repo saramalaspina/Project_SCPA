@@ -51,12 +51,12 @@ def plot_combined(type_filter, output_filename, threads_per_block=None):
 
         melted = pd.melt(merged, id_vars='matrix', value_vars=['no_warp', 'warp'], var_name='method', value_name='GFlops')
         sns.barplot(data=melted, x='matrix', y='GFlops', hue='method', palette=palette, ax=axs[i])
-        axs[i].set_title(f"{type_filter} CUDA Scheduling Comparison - {titles[i]} (TPB={threads_per_block})")
+        axs[i].set_title(f"CUDA {type_filter} Scheduling Comparison - {titles[i]} (TPB={threads_per_block})", fontsize=18)
         axs[i].grid(True, axis='y', linestyle='--', linewidth=0.7)
         axs[i].grid(False, axis='x')
-        axs[i].set_ylabel("GFlops")
+        axs[i].set_ylabel("GigaFlops")
         axs[i].set_xlabel("Matrix")
-        axs[i].legend(loc='upper right')
+        axs[i].legend(loc='upper right', fontsize=16, title_fontsize=18)
         axs[i].tick_params(axis='x', rotation=0)
 
     plt.tight_layout()

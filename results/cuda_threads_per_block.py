@@ -67,10 +67,10 @@ def plot_single_speedup(df, algo_col, mode_val, save_path, algo_label):
             ax=ax
         )
         ax.set_xticks([128, 256, 512, 1024])
-        ax.set_title(f"Speedup {algo_label} — {subtitle}")
+        ax.set_title(f"CUDA {algo_label} Threads per Block Speedup — {subtitle}", fontsize=16)
         ax.set_xlabel("Threads Per Block")
         ax.set_ylabel("Speedup")
-        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=14, title_fontsize=16)
         ax.grid(True)
 
     # Plot both subsets: few and many non-zeros

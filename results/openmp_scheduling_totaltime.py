@@ -44,16 +44,16 @@ def plot_time_comparison(type_filter, output_filename):
         sns.barplot(data=melted, x='matrix', y='Time (ms)', hue='method', palette=palette, ax=axs[i])
         
         axs[i].set_yscale('log')
-        axs[i].set_title(f"{type_filter} OpenMP Scheduling Comparison - {titles[i]}")
+        axs[i].set_title(f"OpenMP {type_filter} Scheduling Comparison - {titles[i]}", fontsize= 18)
         axs[i].grid(True, axis='y', linestyle='--', linewidth=0.7)
         axs[i].grid(False, axis='x')
         axs[i].set_ylabel("Execution Time (ms)")
         axs[i].set_xlabel("Matrix")
-        axs[i].legend(loc='upper right')
+        axs[i].legend(loc='upper right', fontsize=16, title_fontsize=18)
         for label in axs[i].get_xticklabels():
             label.set_rotation(0)
 
-    axs[0].legend(loc='upper left')
+    axs[0].legend(loc='upper left', fontsize=16, title_fontsize=18)
     plt.tight_layout()
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
     plt.savefig(output_filename)

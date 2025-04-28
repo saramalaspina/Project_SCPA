@@ -35,23 +35,25 @@ def plot_speedup_comparison(df, nz_threshold, save_path):
 
     # Plot for matrices with few nz
     sns.barplot(ax=axes[0], data=df_few, x='matrix', y='speedup', hue='type', palette=custom_palette)
-    axes[0].set_title("OpenMP Speedup Comparison (CSR vs HLL) - Matrices with Few Non-Zeros (< 1e6)")
+    axes[0].set_title("OpenMP CSR vs HLL Speedup Comparison - Matrices with Few Non-Zeros (< 1e6)", fontsize = 20)
     axes[0].set_xlabel("Matrix")
     axes[0].set_ylabel("Speedup")
-    axes[0].legend(loc='upper right')
+    axes[0].legend(loc='upper right', fontsize=16, title_fontsize=18)
     axes[0].grid(True, axis='y', linestyle='--', linewidth=0.7)  # Add horizontal grid lines
     for label in axes[0].get_xticklabels():
         label.set_rotation(0)
+        label.set_fontsize(14)
 
     # Plot for matrices with many nz
     sns.barplot(ax=axes[1], data=df_many, x='matrix', y='speedup', hue='type', palette=custom_palette)
-    axes[1].set_title("OpenMP Speedup Comparison (CSR vs HLL) - Matrices with Many Non-Zeros (≥ 1e6)")
+    axes[1].set_title("OpenMP CSR vs HLL Speedup Comparison - Matrices with Many Non-Zeros (≥ 1e6)", fontsize = 20)
     axes[1].set_xlabel("Matrix")
     axes[1].set_ylabel("Speedup")
-    axes[1].legend(loc='upper right')
+    axes[1].legend(loc='upper right', fontsize=16, title_fontsize=18)
     axes[1].grid(True, axis='y', linestyle='--', linewidth=0.7)  # Add horizontal grid lines
     for label in axes[1].get_xticklabels():
         label.set_rotation(0)
+        label.set_fontsize(14)
 
     # Adjust layout and save the plot
     plt.tight_layout()
