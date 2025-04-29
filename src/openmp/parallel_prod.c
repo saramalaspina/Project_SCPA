@@ -108,9 +108,11 @@ void prod_openmp_hll(const HLLMatrix * __restrict__ hll, const double * __restri
                 for (int j = 0; j < block->maxnz; j++) {
                     int idx = j * block->block_rows + row_offset;
                     int col = block->JA[idx];
-                    sum += block->AS[idx] * x[col];
+                     // Check if the index is valid (not a padded entry)
+                    if (col != -1) {  
+                        sum += block->AS[idx] * x[col]; 
+                    }
                 }
-
                 // Store the result in the output vector
                 y[global_row] = sum;
             }
