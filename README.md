@@ -1,12 +1,15 @@
-# Progetto SCPA - Calcolo parallelo per il prodotto tra una matrice sparsa e un vettore. 
+# Progetto SCPA - Calcolo parallelo per il prodotto tra una matrice sparsa e un vettore 
 
 L’obiettivo di questo lavoro è quello di sviluppare un nucleo di calcolo per il prodotto tra una matrice sparsa ed un vettore, che sia in grado di calcolare:
 
 y ← Ax
 
 La matrice è memorizzata nei formati:
+
 • CSR
+
 • HLL
+
 Il nucleo è stato parallelizzato tramite OpenMP e CUDA ed è stato collaudato confrontando i risultati paralleli con quelli ottenuti da un’implementazione seriale.
 
 Passi per l'esecuzione:
