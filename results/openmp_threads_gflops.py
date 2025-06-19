@@ -58,6 +58,5 @@ def plot_performance(df_few, df_many, algo_type, save_path):
 # Ensure the output directory exists
 os.makedirs("openmp/graphs", exist_ok=True)
 
-# Generate combined plots
 plot_performance(df_few, df_many, "CSR", "openmp/graphs/csr_threads_gflops.png")
 plot_performance(df_few, df_many, "HLL", "openmp/graphs/hll_threads_gflops.png")

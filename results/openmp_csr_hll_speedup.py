@@ -70,5 +70,4 @@ df['matrix'] = df['matrix'].str.strip()
 nz_threshold = 1_000_000
 save_path = "openmp/graphs/csr_hll_speedup.png"
 
-# Call the function to create and save the plot
 plot_speedup_comparison(df, nz_threshold, save_path)

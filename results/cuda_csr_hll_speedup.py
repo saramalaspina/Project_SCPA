@@ -2,22 +2,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Nuova funzione combinata
 def plot_speedup(save_path, filename):
     sns.set_theme(style="whitegrid")
 
-    # Caricamento e pulizia dati
+    # Load and clean data
     df = pd.read_csv(filename)
     df.columns = df.columns.str.strip()
     df['matrix'] = df['matrix'].str.strip()
 
-    # Melt del DataFrame per una singola colonna di speedup
+    # Melt the DataFrame to have a single column for speedup and a corresponding type
     df_melt = pd.melt(df, id_vars=['matrix', 'nz', 'time_serial'], value_vars=['speedup_csr', 'speedup_hll'], var_name='type', value_name='speedup')
 
-    # Pulizia della colonna 'type'
+    # Clean the 'type' column (remove 'speedup_' prefix and make it uppercase)
     df_melt['type'] = df_melt['type'].str.replace('speedup_', '', regex=False).str.upper()
 
-    # Soglia nz
+    # Threshold nz
     nz_threshold = 1_000_000
     data_few = df_melt[df_melt['nz'] < nz_threshold]
     data_many = df_melt[df_melt['nz'] >= nz_threshold]
@@ -50,7 +49,7 @@ def plot_speedup(save_path, filename):
         label.set_rotation(0)
         label.set_fontsize(14)
 
-    # Layout e salvataggio
+    # Adjust layout and save the plot
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     print(f"Plot saved to: {save_path}")

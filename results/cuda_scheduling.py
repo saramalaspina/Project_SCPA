@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Load and clean data
 df_no_warp = pd.read_csv("cuda/performance.csv")
 df_warp = pd.read_csv("cuda/performance_warp.csv")
 
@@ -11,7 +12,7 @@ df_no_warp['type'] = df_no_warp['type'].str.strip()
 df_warp.columns = df_warp.columns.str.strip()
 df_warp['type'] = df_warp['type'].str.strip()
 
-# Aggiungi colonna di classificazione
+# Add classification column
 def classify_nz(df):
     df['group'] = df['nz'].apply(lambda x: '<1M' if x < 1_000_000 else '≥1M')
     return df
@@ -20,11 +21,13 @@ df_no_warp = classify_nz(df_no_warp)
 df_warp = classify_nz(df_warp)
 
 def plot_combined(type_filter, output_filename, threads_per_block=None):
+    # Set seaborn style
     sns.set_theme(style="whitegrid")
 
+    # Custom color palette
     palette = {
-        "warp": "#a7f3d0",  # light green
-        "no_warp": "#c084fc",  # vibrant lilac
+        "warp": "#a7f3d0",
+        "no_warp": "#c084fc",
     }
 
     fig, axs = plt.subplots(2, 1, figsize=(20, 12), sharex=False)
@@ -35,7 +38,6 @@ def plot_combined(type_filter, output_filename, threads_per_block=None):
         df1 = df_no_warp[(df_no_warp['type'] == type_filter) & (df_no_warp['group'] == group)]
         df2 = df_warp[(df_warp['type'] == type_filter) & (df_warp['group'] == group)]
 
-        # Filtro opzionale su threadsPerBlock
         if threads_per_block is not None:
             df1 = df1[df1['threadsPerBlock'] == threads_per_block]
             df2 = df2[df2['threadsPerBlock'] == threads_per_block]
@@ -64,7 +66,5 @@ def plot_combined(type_filter, output_filename, threads_per_block=None):
     plt.close()
     print(f"Plot saved to: {output_filename}")
 
-
-# Genera i due grafici
 plot_combined('HLL', 'cuda/graphs/hll_scheduling.png', threads_per_block=128)
 plot_combined('CSR', 'cuda/graphs/csr_scheduling.png', threads_per_block=128)

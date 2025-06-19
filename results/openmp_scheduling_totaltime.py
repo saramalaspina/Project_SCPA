@@ -60,7 +60,6 @@ def plot_time_comparison(type_filter, output_filename):
     plt.close()
     print(f"Plot saved to: {output_filename}")
 
-# Generate charts
 plot_time_comparison('HLL', 'openmp/graphs/hll_scheduling_totaltime.png')
 plot_time_comparison('CSR', 'openmp/graphs/csr_scheduling_totaltime.png')
 

@@ -59,5 +59,4 @@ def plot_bar_gflops_comparison(df_few, df_many, save_path):
     print(f"Plot saved to: {save_path}")
     plt.close()
 
-# Call the function
 plot_bar_gflops_comparison(df_few, df_many, "openmp/graphs/csr_hll_gflops.png")
